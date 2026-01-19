@@ -1,0 +1,78 @@
+@prefix ocean: <http://example.org/ocean#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+############################
+# CLASSES
+############################
+ocean:PersonalityTrait a owl:Class .
+ocean:TraitLevel a owl:Class .
+ocean:TraitState a owl:Class .     # 🔥 Trait + Level
+ocean:Behavior a owl:Class .
+ocean:Rule a owl:Class .
+
+############################
+# OBJECT PROPERTIES
+############################
+ocean:inducesBehavior a owl:ObjectProperty ;
+    rdfs:domain ocean:TraitState ;
+    rdfs:range ocean:Behavior .
+
+ocean:activatedByRule a owl:ObjectProperty ;
+    rdfs:domain ocean:TraitState ;
+    rdfs:range ocean:Rule .
+
+############################
+# TRAITS
+############################
+ocean:Extraversion a ocean:PersonalityTrait .
+ocean:Neuroticism a ocean:PersonalityTrait .
+ocean:Agreeableness a ocean:PersonalityTrait .
+ocean:Conscientiousness a ocean:PersonalityTrait .
+ocean:Openness a ocean:PersonalityTrait .
+
+############################
+# BEHAVIORS
+############################
+ocean:Leadership a ocean:Behavior .
+ocean:SocialInteraction a ocean:Behavior .
+ocean:StressSensitivity a ocean:Behavior .
+ocean:Creativity a ocean:Behavior .
+ocean:Planning a ocean:Behavior .
+ocean:Empathy a ocean:Behavior .
+
+############################
+# RULES
+############################
+ocean:Extraversion_High_Rule a ocean:Rule .
+ocean:Neuroticism_High_Rule a ocean:Rule .
+ocean:Openness_High_Rule a ocean:Rule .
+ocean:Conscientiousness_High_Rule a ocean:Rule .
+ocean:Agreeableness_High_Rule a ocean:Rule .
+
+############################
+# TRAIT STATES (🔥 KUNCI)
+############################
+
+ocean:ExtraversionHigh a ocean:TraitState ;
+    ocean:inducesBehavior ocean:Leadership ,
+                          ocean:SocialInteraction ;
+    ocean:activatedByRule ocean:Extraversion_High_Rule .
+
+ocean:NeuroticismHigh a ocean:TraitState ;
+    ocean:inducesBehavior ocean:StressSensitivity ;
+    ocean:activatedByRule ocean:Neuroticism_High_Rule .
+
+ocean:OpennessHigh a ocean:TraitState ;
+    ocean:inducesBehavior ocean:Creativity ;
+    ocean:activatedByRule ocean:Openness_High_Rule .
+
+ocean:ConscientiousnessHigh a ocean:TraitState ;
+    ocean:inducesBehavior ocean:Planning ;
+    ocean:activatedByRule ocean:Conscientiousness_High_Rule .
+
+ocean:AgreeablenessHigh a ocean:TraitState ;
+    ocean:inducesBehavior ocean:Empathy ;
+    ocean:activatedByRule ocean:Agreeableness_High_Rule .
