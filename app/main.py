@@ -100,46 +100,23 @@ class OceanModel(nn.Module):
 # ==========================
 # LOAD MODEL FROM HF
 # ==========================
-# print("📦 Loading model from HuggingFace...")
-# config = AutoConfig.from_pretrained(HF_REPO)
-# tokenizer = AutoTokenizer.from_pretrained(HF_REPO)
-# encoder = AutoModel.from_pretrained(HF_REPO)
+print("📦 Loading model from HuggingFace...")
+config = AutoConfig.from_pretrained(HF_REPO)
+tokenizer = AutoTokenizer.from_pretrained(HF_REPO)
+encoder = AutoModel.from_pretrained(HF_REPO)
 
-# model = OceanModel(encoder, LEXICAL_SIZE)
-# state_path = hf_hub_download(repo_id=HF_REPO, filename="pytorch_model.bin")
-# state_dict = torch.load(state_path, map_location=DEVICE)
+model = OceanModel(encoder, LEXICAL_SIZE)
+state_path = hf_hub_download(repo_id=HF_REPO, filename="pytorch_model.bin")
+state_dict = torch.load(state_path, map_location=DEVICE)
 
-# if state_dict["fc.weight"].shape != model.fc.weight.shape:
-#     print("⚠️ FC mismatch detected, resizing layer")
-#     model.fc = nn.Linear(encoder.config.hidden_size + LEXICAL_SIZE, 5)
+if state_dict["fc.weight"].shape != model.fc.weight.shape:
+    print("⚠️ FC mismatch detected, resizing layer")
+    model.fc = nn.Linear(encoder.config.hidden_size + LEXICAL_SIZE, 5)
 
-# model.load_state_dict(state_dict, strict=False)
-# model.to(DEVICE)
-# model.eval()
-# print("✅ Model loaded & ready")
-def load_model():
-    global tokenizer, model
-
-    if model is not None:
-        return
-
-    print("📦 Loading model at runtime...")
-
-    tokenizer = AutoTokenizer.from_pretrained(HF_REPO)
-    encoder = AutoModel.from_pretrained(HF_REPO)
-
-    model_local = OceanModel(encoder, LEXICAL_SIZE)
-
-    state_path = hf_hub_download(
-        repo_id=HF_REPO,
-        filename="pytorch_model.bin"
-    )
-
-    state_dict = torch.load(state_path, map_location="cpu")
-    model_local.load_state_dict(state_dict, strict=False)
-
-    model_local.eval()
-    model = model_local
+model.load_state_dict(state_dict, strict=False)
+model.to(DEVICE)
+model.eval()
+print("✅ Model loaded & ready")
 
 # ==========================
 # FASTAPI INIT
