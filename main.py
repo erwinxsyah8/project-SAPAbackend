@@ -26,6 +26,9 @@ from transformers import AutoTokenizer, AutoModel, AutoConfig
 from huggingface_hub import hf_hub_download
 from collections import defaultdict, Counter
 from app.logger_setup import logger
+from pathlib import Path
+
+
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 os.environ["OMP_NUM_THREADS"] = "1"
 os.environ["MKL_NUM_THREADS"] = "1"
@@ -47,9 +50,12 @@ TWITTER_SCOPES = ["tweet.read", "users.read", "offline.access"]
 # ==========================
 # CONFIG
 # ==========================
+BASE_DIR = Path(__file__).resolve().parent
+
+ONTOLOGY_CSV = BASE_DIR / "ontology_clean.csv"
+ONTOLOGY_EMB = BASE_DIR / "ontology_embeddingss.pt"
+
 HF_REPO = "sapadev13/sapa_ocean_id"
-ONTOLOGY_CSV = "ontology_clean.csv"
-ONTOLOGY_EMB = "ontology_embeddingss.pt"
 DEVICE = "cpu"
 MAX_LEN = 256
 
