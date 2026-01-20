@@ -3,22 +3,26 @@ __pycache__
 *.pyc
 *.pyo
 *.pyd
+
 .env.*
 .venv
 virtualenv
 node_modules
 .cache
-huggingface
-*.pt
-!ontology_embeddings.pt
-app/*
-!app/ontology_embeddings.pt
 
-*.bin
+# Jangan buang huggingface cache kalau runtime
+# .cache/huggingface
+
+# Model files
 *.onnx
 *.pkl
 *.joblib
 *.zip
+
+# Jangan ignore model utama
+!ontology_embeddings.pt
+!pytorch_model.bin
+
 data/
 logs/
 tmp/

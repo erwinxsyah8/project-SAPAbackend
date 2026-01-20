@@ -61,35 +61,13 @@ MAX_LEN = 256
 
 # ==========================
 # LOAD ONTOLOGY CSV
-# ==========================
-print("📄 Loading ontology CSV...")
-ontology_df = pd.read_csv(ONTOLOGY_CSV)
-ontology_df["tokens"] = ontology_df["lexeme"].apply(lambda x: x.split("_"))
-if "strength" not in ontology_df.columns:
-    ontology_df["strength"] = 1.0
-
-SUBTRAITS = sorted(ontology_df["sub_trait"].unique())
-LEXICAL_SIZE = len(SUBTRAITS)
-subtrait2id = {s: i for i, s in enumerate(SUBTRAITS)}
-
-LEXICON = defaultdict(list)
-for _, row in ontology_df.iterrows():
-    LEXICON[row["sub_trait"]].append({
-        "tokens": set(row["tokens"]),
-        "strength": float(row["strength"]),
-        "lexeme": row["lexeme"]
-    })
-
-print(f"✅ Ontology loaded: {len(ontology_df)} lexemes | {LEXICAL_SIZE} subtraits")
-
-# ==========================
-# LOAD ONTOLOGY EMBEDDINGS
-# ==========================
-print("📦 Loading ontology embeddings...")
-ont_emb = torch.load(ONTOLOGY_EMB, map_location="cpu")
-ONT_EMBEDDINGS = ont_emb["embeddings"].numpy()
-ONT_META = ont_emb["meta"]
-print(f"✅ Ontology embeddings loaded: {len(ONT_META)} lexemes")
+# ==========================ontology_df = None
+SUBTRAITS = None
+LEXICAL_SIZE = None
+subtrait2id = None
+LEXICON = None
+ONT_EMBEDDINGS = None
+ONT_META = None
 
 # ==========================
 # MODEL DEFINITION
@@ -940,36 +918,54 @@ oauth = get_oauth_handler()
 # ==========================
 # ROUTES
 # ==========================
-@app.get("/")
-def root():
-    return {
-        "status": "SAPA OCEAN API READY",
-        "device": DEVICE,
-        "subtraits": LEXICAL_SIZE,
-        "status": "OK"
-    }
-AUTH_URL = "https://twitter.com/i/oauth2/authorize"
-TOKEN_URL = "https://api.twitter.com/2/oauth2/token"
-
+app = FastAPI()
 @app.on_event("startup")
-def load_model():
-    global model, tokenizer
+def startup_event():
+    global ontology_df, SUBTRAITS, LEXICAL_SIZE, subtrait2id
+    global LEXICON, ONT_EMBEDDINGS, ONT_META
+    global tokenizer, model
+
+    logger.info("🚀 Startup: loading ontology")
+    ...
+    logger.info("✅ Ontology loaded")
+
+    # ======================
+    # LOAD MODEL
+    # ======================
+    logger.info("🤖 Loading OCEAN model...")
 
     config = AutoConfig.from_pretrained(HF_REPO)
     tokenizer = AutoTokenizer.from_pretrained(HF_REPO)
     encoder = AutoModel.from_pretrained(HF_REPO)
 
-    model = OceanModel(encoder, LEXICAL_SIZE)
+    model_local = OceanModel(encoder, LEXICAL_SIZE)
 
     state_path = hf_hub_download(
         repo_id=HF_REPO,
         filename="pytorch_model.bin"
     )
     state_dict = torch.load(state_path, map_location=DEVICE)
-    model.load_state_dict(state_dict, strict=False)
+    model_local.load_state_dict(state_dict, strict=False)
 
-    model.to(DEVICE)
-    model.eval()
+    model_local.to(DEVICE)
+    model_local.eval()
+
+    model = model_local
+
+    logger.info("✅ Model & tokenizer ready")
+
+
+@app.get("/")
+def root():
+    return {
+    "service": "SAPA OCEAN API",
+    "device": DEVICE,
+    "subtraits": LEXICAL_SIZE,
+    "status": "OK"
+}
+
+AUTH_URL = "https://twitter.com/i/oauth2/authorize"
+TOKEN_URL = "https://api.twitter.com/2/oauth2/token"
 
 @app.get("/auth/twitter/login")
 def twitter_login(request: Request):
@@ -1100,12 +1096,19 @@ def predict_other_profile(data: dict, request: Request):
     except Exception as e:
         logging.error(f"Error in /predict/twitter/profile: {str(e)}")
         raise HTTPException(500, f"Server error: {str(e)}")
-
 def run_ocean_pipeline(text: str, username: str | None = None):
 
+    if tokenizer is None or model is None:
+        raise HTTPException(503, "Model not ready")
+
+    # ===== Lexical =====
     lexical, coverage, subtraits, evidence = build_lexical_vector_with_analysis(text)
     lexical = lexical.to(DEVICE)
 
+    if lexical.dim() == 1:
+        lexical = lexical.unsqueeze(0)
+
+    # ===== Tokenize =====
     enc = tokenizer(
         text,
         padding="max_length",
@@ -1113,27 +1116,36 @@ def run_ocean_pipeline(text: str, username: str | None = None):
         max_length=MAX_LEN,
         return_tensors="pt"
     )
+    enc = {k: v.to(DEVICE) for k, v in enc.items()}
 
+    # ===== Inference =====
     with torch.no_grad():
         out = model(
-            enc["input_ids"].to(DEVICE),
-            enc["attention_mask"].to(DEVICE),
+            enc["input_ids"],
+            enc["attention_mask"],
             lexical
         )
 
     raw = {
-        "O": round(out[0,0].item(), 3),
-        "C": round(out[0,1].item(), 3),
-        "E": round(out[0,2].item(), 3),
-        "A": round(out[0,3].item(), 3),
-        "N": round(out[0,4].item(), 3),
+        "O": round(out[0, 0].item(), 3),
+        "C": round(out[0, 1].item(), 3),
+        "E": round(out[0, 2].item(), 3),
+        "A": round(out[0, 3].item(), 3),
+        "N": round(out[0, 4].item(), 3),
     }
 
     dominant, adjusted = adjust_ocean_by_keywords(raw, text)
     adjusted = apply_emotional_keyword_adjustment(text, adjusted)
     dominant = max(adjusted, key=adjusted.get)
 
-    explanation, suggestion = generate_explanation_suggestion_super(text, adjusted, evidence)
+    explanation, suggestion = generate_explanation_suggestion_super(
+        text, adjusted, evidence
+    )
+
+    try:
+        chart = generate_ocean_chart(adjusted)
+    except Exception:
+        chart = None
 
     return {
         "username": username,
@@ -1143,8 +1155,9 @@ def run_ocean_pipeline(text: str, username: str | None = None):
         "personality_profile": generate_persona_profile(adjusted),
         "explanation": explanation,
         "suggestion": suggestion,
-        "ocean_chart_base64": generate_ocean_chart(adjusted)
+        "ocean_chart_base64": chart
     }
+
 @app.post("/predict/excel")
 async def predict_from_excel(file: UploadFile = File(...)):
     """
