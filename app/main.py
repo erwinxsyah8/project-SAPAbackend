@@ -53,7 +53,7 @@ TWITTER_SCOPES = ["tweet.read", "users.read", "offline.access"]
 BASE_DIR = Path(__file__).resolve().parent
 
 ONTOLOGY_CSV = BASE_DIR / "ontology_clean.csv"
-ONTOLOGY_EMB = BASE_DIR / "ontology_embeddingss.pt"
+ONTOLOGY_EMB = BASE_DIR / "ontology_embeddings.pt"
 
 HF_REPO = "sapadev13/sapa_ocean_id"
 DEVICE = "cpu"
