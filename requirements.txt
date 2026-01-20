@@ -11,6 +11,11 @@ torch==2.1.2
 transformers==4.36.2
 tokenizers==0.15.0
 huggingface-hub==0.20.2
+fastapi
+uvicorn
+matplotlib
+numpy
+pandas
 
 python-dotenv==1.0.1
 itsdangerous==2.2.0
