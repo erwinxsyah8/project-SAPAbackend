@@ -7,6 +7,7 @@ import random
 import tweepy
 import math
 import os
+import logging
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 import matplotlib.pyplot as plt
 import base64, hashlib
@@ -26,6 +27,16 @@ from transformers import AutoTokenizer, AutoModel, AutoConfig
 from huggingface_hub import hf_hub_download
 from collections import defaultdict, Counter
 
+logging.basicConfig(
+    filename="/tmp/passenger_debug.log",
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+)
+
+logger = logging.getLogger(__name__)
+logger.info("FastAPI app starting...")
+
+
 load_dotenv()
 TWITTER_API_KEY = os.getenv("TWITTER_API_KEY")
 TWITTER_API_SECRET = os.getenv("TWITTER_API_SECRET")
@@ -43,7 +54,7 @@ TWITTER_SCOPES = ["tweet.read", "users.read", "offline.access"]
 HF_REPO = "sapadev13/sapa_ocean_id"
 ONTOLOGY_CSV = "ontology_clean.csv"
 ONTOLOGY_EMB = "ontology_embeddings.pt"
-DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+DEVICE = "cpu"
 MAX_LEN = 256
 
 # ==========================
