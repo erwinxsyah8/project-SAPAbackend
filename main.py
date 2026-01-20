@@ -75,6 +75,10 @@ ONT_META = None
 class OceanModel(nn.Module):
     def __init__(self, encoder, lexical_size):
         super().__init__()
+
+        if lexical_size is None:
+            raise ValueError("lexical_size tidak boleh None")
+
         self.encoder = encoder
         hidden = encoder.config.hidden_size
         self.fc = nn.Linear(hidden + lexical_size, 5)
@@ -918,41 +922,76 @@ oauth = get_oauth_handler()
 # ==========================
 # ROUTES
 # ==========================
-app = FastAPI()
 @app.on_event("startup")
 def startup_event():
     global ontology_df, SUBTRAITS, LEXICAL_SIZE, subtrait2id
     global LEXICON, ONT_EMBEDDINGS, ONT_META
     global tokenizer, model
 
-    logger.info("🚀 Startup: loading ontology")
-    ...
-    logger.info("✅ Ontology loaded")
+    logger.info("🚀 Startup loading ontology & model")
 
-    # ======================
-    # LOAD MODEL
-    # ======================
-    logger.info("🤖 Loading OCEAN model...")
+    # ===============================
+    # 1️⃣ LOAD ONTOLOGY (WAJIB DULU)
+    # ===============================
+    ontology_df = pd.read_csv(ONTOLOGY_CSV)
 
-    config = AutoConfig.from_pretrained(HF_REPO)
+    if ontology_df is None or ontology_df.empty:
+        raise RuntimeError("Ontology CSV kosong / gagal dibaca")
+
+    ontology_df["tokens"] = ontology_df["lexeme"].astype(str).apply(lambda x: x.split("_"))
+
+    if "strength" not in ontology_df.columns:
+        ontology_df["strength"] = 1.0
+
+    SUBTRAITS = sorted(ontology_df["sub_trait"].dropna().unique())
+    LEXICAL_SIZE = len(SUBTRAITS)
+
+    if LEXICAL_SIZE == 0:
+        raise RuntimeError("LEXICAL_SIZE = 0, ontology bermasalah")
+
+    subtrait2id = {s: i for i, s in enumerate(SUBTRAITS)}
+
+    LEXICON = defaultdict(list)
+    for _, row in ontology_df.iterrows():
+        LEXICON[row["sub_trait"]].append({
+            "tokens": set(row["tokens"]),
+            "strength": float(row["strength"]),
+            "lexeme": row["lexeme"]
+        })
+
+    # ===============================
+    # 2️⃣ LOAD ONTOLOGY EMBEDDING
+    # ===============================
+    ont_emb = torch.load(ONTOLOGY_EMB, map_location="cpu")
+    ONT_EMBEDDINGS = ont_emb["embeddings"].numpy()
+    ONT_META = ont_emb["meta"]
+
+    # ===============================
+    # 3️⃣ LOAD TOKENIZER & ENCODER
+    # ===============================
     tokenizer = AutoTokenizer.from_pretrained(HF_REPO)
     encoder = AutoModel.from_pretrained(HF_REPO)
 
-    model_local = OceanModel(encoder, LEXICAL_SIZE)
+    # ===============================
+    # 4️⃣ BUILD MODEL (SETELAH LEXICAL_SIZE ADA)
+    # ===============================
+    model = OceanModel(encoder, LEXICAL_SIZE)
 
+    # ===============================
+    # 5️⃣ LOAD WEIGHT (.bin)
+    # ===============================
     state_path = hf_hub_download(
         repo_id=HF_REPO,
         filename="pytorch_model.bin"
     )
-    state_dict = torch.load(state_path, map_location=DEVICE)
-    model_local.load_state_dict(state_dict, strict=False)
 
-    model_local.to(DEVICE)
-    model_local.eval()
+    state_dict = torch.load(state_path, map_location="cpu")
+    model.load_state_dict(state_dict, strict=False)
 
-    model = model_local
+    model.to(DEVICE)
+    model.eval()
 
-    logger.info("✅ Model & tokenizer ready")
+    logger.info(f"✅ Startup OK | LEXICAL_SIZE={LEXICAL_SIZE}")
 
 
 @app.get("/")
