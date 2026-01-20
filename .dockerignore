@@ -10,6 +10,10 @@ node_modules
 .cache
 huggingface
 *.pt
+!ontology_embeddings.pt
+app/*
+!app/ontology_embeddings.pt
+
 *.bin
 *.onnx
 *.pkl
