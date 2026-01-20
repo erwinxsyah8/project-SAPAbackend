@@ -16,6 +16,7 @@ uvicorn
 matplotlib
 numpy
 pandas
+python-multipart
 
 python-dotenv==1.0.1
 itsdangerous==2.2.0
