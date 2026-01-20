@@ -49,7 +49,7 @@ TWITTER_SCOPES = ["tweet.read", "users.read", "offline.access"]
 # ==========================
 HF_REPO = "sapadev13/sapa_ocean_id"
 ONTOLOGY_CSV = "ontology_clean.csv"
-ONTOLOGY_EMB = "ontology_embeddings.pt"
+ONTOLOGY_EMB = "ontology_embeddingss.pt"
 DEVICE = "cpu"
 MAX_LEN = 256
 
