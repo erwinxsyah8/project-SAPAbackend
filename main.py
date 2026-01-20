@@ -113,23 +113,6 @@ class OceanModel(nn.Module):
 # ==========================
 # LOAD MODEL FROM HF
 # ==========================
-print("📦 Loading model from HuggingFace...")
-config = AutoConfig.from_pretrained(HF_REPO)
-tokenizer = AutoTokenizer.from_pretrained(HF_REPO)
-encoder = AutoModel.from_pretrained(HF_REPO)
-
-model = OceanModel(encoder, LEXICAL_SIZE)
-state_path = hf_hub_download(repo_id=HF_REPO, filename="pytorch_model.bin")
-state_dict = torch.load(state_path, map_location=DEVICE)
-
-if state_dict["fc.weight"].shape != model.fc.weight.shape:
-    print("⚠️ FC mismatch detected, resizing layer")
-    model.fc = nn.Linear(encoder.config.hidden_size + LEXICAL_SIZE, 5)
-
-model.load_state_dict(state_dict, strict=False)
-model.to(DEVICE)
-model.eval()
-print("✅ Model loaded & ready")
 
 # ==========================
 # FASTAPI INIT
@@ -967,6 +950,26 @@ def root():
     }
 AUTH_URL = "https://twitter.com/i/oauth2/authorize"
 TOKEN_URL = "https://api.twitter.com/2/oauth2/token"
+
+@app.on_event("startup")
+def load_model():
+    global model, tokenizer
+
+    config = AutoConfig.from_pretrained(HF_REPO)
+    tokenizer = AutoTokenizer.from_pretrained(HF_REPO)
+    encoder = AutoModel.from_pretrained(HF_REPO)
+
+    model = OceanModel(encoder, LEXICAL_SIZE)
+
+    state_path = hf_hub_download(
+        repo_id=HF_REPO,
+        filename="pytorch_model.bin"
+    )
+    state_dict = torch.load(state_path, map_location=DEVICE)
+    model.load_state_dict(state_dict, strict=False)
+
+    model.to(DEVICE)
+    model.eval()
 
 @app.get("/auth/twitter/login")
 def twitter_login(request: Request):
