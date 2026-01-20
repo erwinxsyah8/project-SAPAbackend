@@ -25,9 +25,12 @@ from pydantic import BaseModel
 from transformers import AutoTokenizer, AutoModel, AutoConfig
 from huggingface_hub import hf_hub_download
 from collections import defaultdict, Counter
+from app.logger_setup import logger
 
 
 load_dotenv()
+logger.info("FastAPI app starting...")
+
 TWITTER_API_KEY = os.getenv("TWITTER_API_KEY")
 TWITTER_API_SECRET = os.getenv("TWITTER_API_SECRET")
 if not TWITTER_API_KEY or not TWITTER_API_SECRET:
