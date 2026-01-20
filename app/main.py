@@ -7,7 +7,6 @@ import random
 import tweepy
 import math
 import os
-import logging
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 import matplotlib.pyplot as plt
 import base64, hashlib
@@ -26,15 +25,6 @@ from pydantic import BaseModel
 from transformers import AutoTokenizer, AutoModel, AutoConfig
 from huggingface_hub import hf_hub_download
 from collections import defaultdict, Counter
-
-logging.basicConfig(
-    filename="/tmp/passenger_debug.log",
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s",
-)
-
-logger = logging.getLogger(__name__)
-logger.info("FastAPI app starting...")
 
 
 load_dotenv()
