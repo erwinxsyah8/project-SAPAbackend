@@ -7,7 +7,7 @@ import random
 import tweepy
 import math
 import os
-
+os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 import matplotlib.pyplot as plt
 import base64, hashlib
 import pandas as pd
@@ -26,10 +26,7 @@ from transformers import AutoTokenizer, AutoModel, AutoConfig
 from huggingface_hub import hf_hub_download
 from collections import defaultdict, Counter
 from app.logger_setup import logger
-os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
-os.environ["OMP_NUM_THREADS"] = "1"
-os.environ["MKL_NUM_THREADS"] = "1"
-torch.set_num_threads(1)
+
 
 load_dotenv()
 logger.info("FastAPI app starting...")

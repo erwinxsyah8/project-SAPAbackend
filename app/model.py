@@ -1,38 +1,45 @@
+# app/model.py
+
 import torch
 import torch.nn as nn
-from transformers import AutoModel
+from transformers import AutoTokenizer, AutoModel, AutoConfig
+from huggingface_hub import hf_hub_download
 
-STUDENT_NAME = "huawei-noah/TinyBERT_General_4L_312D"
-LABEL_COLS = ["O", "C", "E", "A", "N"]
+HF_REPO = "sapadev13/sapa_ocean_id"
+DEVICE = "cpu"
 
-class TinyBERT_TFIDF(nn.Module):
-    def __init__(self, tfidf_dim):
+class OceanModel(nn.Module):
+    def __init__(self, encoder, lexical_size):
         super().__init__()
+        hidden = encoder.config.hidden_size
+        self.encoder = encoder
+        self.fc = nn.Linear(hidden + lexical_size, 5)
 
-        self.encoder = AutoModel.from_pretrained(STUDENT_NAME)
-
-        self.tfidf_proj = nn.Sequential(
-            nn.Linear(tfidf_dim, 256),
-            nn.ReLU(),
-            nn.Dropout(0.3)
-        )
-
-        self.regressor = nn.Sequential(
-            nn.Linear(312 + 256, 256),
-            nn.LayerNorm(256),
-            nn.ReLU(),
-            nn.Dropout(0.3),
-            nn.Linear(256, 128),
-            nn.ReLU(),
-            nn.Linear(128, 5)
-        )
-
-    def forward(self, input_ids, attention_mask, tfidf):
-        enc = self.encoder(
+    def forward(self, input_ids, attention_mask, lexical):
+        out = self.encoder(
             input_ids=input_ids,
             attention_mask=attention_mask
         )
-        cls = enc.last_hidden_state[:, 0]
-        tfidf_feat = self.tfidf_proj(tfidf.float())
-        fused = torch.cat([cls, tfidf_feat], dim=1)
-        return self.regressor(fused)
+        cls = out.last_hidden_state[:, 0, :]
+        x = torch.cat([cls, lexical], dim=1)
+        return self.fc(x)
+
+
+# ⬇️⬇️⬇️ INI WAJIB ADA & DI LEVEL FILE (BUKAN DI DALAM CLASS)
+def load_model(lexical_size: int):
+    tokenizer = AutoTokenizer.from_pretrained(HF_REPO)
+    encoder = AutoModel.from_pretrained(HF_REPO)
+
+    model = OceanModel(encoder, lexical_size)
+
+    state_path = hf_hub_download(
+        repo_id=HF_REPO,
+        filename="pytorch_model.bin"
+    )
+    state_dict = torch.load(state_path, map_location=DEVICE)
+
+    model.load_state_dict(state_dict, strict=False)
+    model.to(DEVICE)
+    model.eval()
+
+    return model, tokenizer
