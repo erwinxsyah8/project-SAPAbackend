@@ -373,6 +373,19 @@ COLLABORATION = [
     "bekerja sama","teamwork","kolaborasi","bersama","kooperatif","mendukung tim",
     "gotong royong","tim","kerja tim","kerjasama","saling membantu"
 ]
+# =========================
+# EXTREME NEGATIVE / SELF-HARM / SUICIDAL
+# =========================
+EXTREME_NEGATIVE = [
+    "ingin mati", "rasanya ingin menyerah", "mati saja", "tidak ingin hidup", 
+    "putus asa ingin mati", "bunuh diri", "tidak tahan hidup", "ingin bunuh diri", 
+    "akhiri hidupku", "sudah tidak kuat", "tidak sanggup lagi", "lepaskan nyawa"
+]
+
+# Variants imbuhan sederhana
+EXTREME_NEGATIVE += [f"ter{w}" for w in ["tekan","putus asa","stres","sakit"]]
+EXTREME_NEGATIVE += [f"me{w}" for w in ["mati","bunuh","menyerah"]]
+
 
 
 # ==========================
@@ -447,6 +460,13 @@ def adjust_ocean_by_keywords(scores: dict, text: str):
             adjusted["A"] += 0.9 * f   # fokus ke agreeableness
             adjusted["E"] += 0.7 * f
             adjusted["N"] -= 0.05 * f
+     # EXTREME_NEGATIVE → N naik lebih tinggi, E turun sedikit
+    for phrase in EXTREME_NEGATIVE:
+        if phrase in text.lower():  # periksa frasa utuh
+            adjusted["N"] += 1.0   # tingkatkan Neuroticism signifikan
+            adjusted["E"] -= 0.2   # ekstrim → lebih introvert
+            # Bisa juga set alert
+            adjusted["EXTREME_ALERT"] = True
 
 
 
@@ -498,7 +518,7 @@ def apply_emotional_keyword_adjustment(text: str, scores: dict):
             adjusted["N"] += 0.35 * f
             adjusted["E"] -= 0.1 * f
 
-    # Social, Achievement, Trust, Relationship
+     # Social, Achievement, Trust, Relationship
     for group_name, keywords in {
         "NEGATIVE_SOCIAL": NEGATIVE_SOCIAL,
         "POSITIVE_SOCIAL": POSITIVE_SOCIAL,
@@ -512,15 +532,16 @@ def apply_emotional_keyword_adjustment(text: str, scores: dict):
     }.items():
         for word in keywords:
             if word in counter:
-                f = math.log(1 + counter[word])  # normalisasi
+                f = math.log(1 + counter[word])
                 for trait, weight in KEYWORD_TRAIT_MAP.get(group_name, {}).items():
-                    adjusted[trait] += weight * f   
+                    adjusted[trait] += weight * f
 
     # Clamp ke skala 1–5
-    for k in adjusted:
+    for k in ["O","C","E","A","N"]:  # jangan clamp EXTREME_ALERT
         adjusted[k] = round(min(5.0, max(1.0, adjusted[k])), 3)
 
     return adjusted
+
 def determine_dominant_trait(scores, text):
     # Hitung E/A/N untuk konteks sosial
     social_hits = sum(1 for w in POSITIVE_SOCIAL+COLLABORATION if w in text.lower())
@@ -550,7 +571,7 @@ def highlight_keywords_in_text(text: str, evidence: dict):
     return result
 
 # ==========================
-# SUPER EXPLANATION
+# SUPER EXPLANATION (UPDATE EXTREME ALERT)
 # ==========================
 def extract_keywords(text, top_n=5):
     return [w for w,_ in Counter(re.findall(r'\w+', text.lower())).most_common(top_n)]
@@ -560,15 +581,32 @@ def generate_explanation_suggestion_super(text, adjusted, evidence):
     words = extract_keywords(text)
     snippet = ", ".join(words[:3])
 
-    explanation = f"Kalimat ini menunjukkan kecenderungan {dominant} karena kata-kata seperti {snippet} menandai pola tersebut."
-    suggestion = f"Mengamati dan menindaklanjuti hal seperti {snippet} dapat membantu mengoptimalkan trait {dominant}."
+    # Peringatan jika kalimat ekstrem
+    if adjusted.get("EXTREME_ALERT"):
+        explanation = (
+            f"⚠ Kalimat ini mengandung indikasi emosional ekstrem / suicidal. "
+            f"Kecenderungan trait {dominant} tetap terlihat, tetapi terdapat risiko tinggi. "
+            f"Kata-kata seperti {snippet} menunjukkan hal tersebut."
+        )
+        suggestion = (
+            f"Sangat disarankan untuk segera memperhatikan kondisi ini dan memberikan dukungan psikologis. "
+            f"Mengamati kata-kata seperti {snippet} dapat membantu mencegah risiko lebih lanjut."
+        )
+    else:
+        explanation = (
+            f"Kalimat ini menunjukkan kecenderungan {dominant} karena kata-kata seperti {snippet} menandai pola tersebut."
+        )
+        suggestion = (
+            f"Mengamati dan menindaklanjuti hal seperti {snippet} dapat membantu mengoptimalkan trait {dominant}."
+        )
 
     return explanation, suggestion
+
 def determine_dominant_contextual(adjusted, evidence):
     sorted_traits = sorted(adjusted.items(), key=lambda x: x[1], reverse=True)
     top_trait, top_score = sorted_traits[0]
 
-    # Hitung jumlah bukti sosial
+    # Hitung jumlah bukti sosial / positif
     social_hits = len(evidence.get("POSITIVE_SOCIAL", []))
     emo_hits = len(evidence.get("EMO_POSITIVE", []))
 
@@ -578,6 +616,7 @@ def determine_dominant_contextual(adjusted, evidence):
         return "A"
 
     return top_trait
+
 PERSONA_RULES = [
     # ================= EMOSI NEGATIF =================
     (
