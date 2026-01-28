@@ -337,28 +337,28 @@ POSITIVE_SOCIAL = [
 ]
 EXTRAVERSION_E = [
     "aktif",
-  "diskusi",
-  "ngobrol",
-  "ramai",
-  "keramaian",
-  "sosial",
-  "interaksi",
-  "bergaul",
-  "berkumpul",
-  "kerja tim",
-  "kolaboratif",
-  "presentasi",
-  "depan umum",
-  "kenal orang baru",
-  "akrab",
-  "nimbrung",
-  "komunikasi",
-  "berbincang",
-  "bercerita",
-  "berbagi cerita",
-  "suasana hidup",
-  "pusat perhatian",
-  "banyak orang",
+    "diskusi",
+    "ngobrol",
+    "ramai",
+    "keramaian",
+    "sosial",
+    "interaksi",
+    "bergaul",
+    "berkumpul",
+    "kerja tim",
+    "kolaboratif",
+    "presentasi",
+    "depan umum",
+    "kenal orang baru",
+    "akrab",
+    "nimbrung",
+    "komunikasi",
+    "berbincang",
+    "bercerita",
+    "berbagi cerita",
+    "suasana hidup",
+    "pusat perhatian",
+    "banyak orang",
     "aktif berdiskusi","aktif berpartisipasi","aktif dalam diskusi","aktif diskusi kelompok",
     "aktif dalam kegiatan bersama","aktif dalam kegiatan kelompok","aktif dalam kegiatan sosial",
     "aktif bersosialisasi","aktif dalam acara sosial","aktif dalam lingkungan sosial",
@@ -584,7 +584,7 @@ def adjust_ocean_by_keywords(scores: dict, text: str):
     for word in POSITIVE_SOCIAL:
         if word in counter:
             f = counter[word]
-            adjusted["A"] += 0.6 * f   # fokus ke agreeableness
+            adjusted["A"] += 0.4 * f   # fokus ke agreeableness
             adjusted["E"] += 0.3 * f
             adjusted["N"] -= 0.05 * f
 
@@ -656,13 +656,13 @@ def adjust_ocean_by_keywords(scores: dict, text: str):
         if word in counter:
             f = counter[word]
             adjusted["E"] += 0.7 * f
-            adjusted["A"] += 0.5 * f
+            adjusted["A"] += 0.3 * f
             adjusted["N"] -= 0.05 * f
     for word in E_SOCIAL_DEPENDENCY:
         if word in counter:
             f = counter[word]
             adjusted["E"] += 0.6 * f
-            adjusted["A"] += 0.4 * f
+            adjusted["A"] += 0.3 * f
             adjusted["N"] -= 0.1 * f
     for word in EMPATHY_HARMONY_A:
         if word in counter:
@@ -688,7 +688,7 @@ def adjust_ocean_by_keywords(scores: dict, text: str):
 # ==========================
 KEYWORD_TRAIT_MAP = {
     "NEGATIVE_SOCIAL": {"E": -0.2, "N": 0.5, "A": -0.1},
-    "POSITIVE_SOCIAL": {"A": 0.6, "E": 0.3, "N": -0.05},
+    "POSITIVE_SOCIAL": {"A": 0.3, "E": 0.6, "N": -0.05},
     "EMO_POSITIVE": {"E": 0.3, "O": 0.15},
     "EMO_NEGATIVE": {"N": 0.35, "O": 0.1},
     "INTROSPECTION": {"O": 0.35},
