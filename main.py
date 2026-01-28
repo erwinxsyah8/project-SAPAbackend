@@ -567,147 +567,88 @@ EXTREME_NEGATIVE += [f"me{w}" for w in ["mati","bunuh","menyerah"]]
 # ==========================
 from collections import Counter
 import re
+import re, math
+from collections import Counter
 
+OCEAN_KEYS = ["O", "C", "E", "A", "N"]
+
+# ==========================
+# MAIN ADJUST FUNCTION
+# ==========================
 def adjust_ocean_by_keywords(scores: dict, text: str):
     adjusted = scores.copy()
-    counter = Counter(re.findall(r'\w+', text.lower()))
+    text_l = text.lower()
+    counter = Counter(re.findall(r'\w+', text_l))
 
-    # NEGATIVE_SOCIAL → menurunkan E, menaikkan N, sedikit turunkan A
-    for word in NEGATIVE_SOCIAL:
-        if word in counter:
-            f = counter[word]
-            adjusted["E"] -= 0.2 * f
-            adjusted["N"] += 0.5 * f
-            adjusted["A"] -= 0.1 * f
+    # Flag kondisi mental berat
+    has_mental_unstable = any(p in text_l for p in MENTAL_UNSTABLE_N)
 
-    # POSITIVE_SOCIAL → menaikkan E & A, sedikit menurunkan N jika sangat negatif
-    for word in POSITIVE_SOCIAL:
-        if word in counter:
-            f = counter[word]
-            adjusted["A"] += 0.6 * f   # fokus ke agreeableness
-            adjusted["E"] += 0.3 * f
-            adjusted["N"] -= 0.05 * f
+    # ==========================
+    # WORD-BASED KEYWORDS
+    # ==========================
+    for group, keywords in WORD_GROUPS.items():
+        for word in keywords:
+            if word in counter:
+                f = math.log1p(counter[word])
 
+                # Skip introspection jika mental tidak stabil
+                if group == "INTROSPECTION" and has_mental_unstable:
+                    continue
 
-    # EMO_POSITIVE → tingkatkan E & O
-    for word in EMO_POSITIVE:
-        if word in counter:
-            f = counter[word]
-            adjusted["E"] += 0.3 * f
-            adjusted["O"] += 0.15 * f
+                for trait, weight in KEYWORD_TRAIT_MAP[group].items():
+                    adjusted[trait] += weight * f
 
-    # EMO_NEGATIVE → tingkatkan N & sedikit O
-    for word in EMO_NEGATIVE:
-        if word in counter:
-            f = counter[word]
-            adjusted["N"] += 0.35 * f
-            adjusted["O"] += 0.1 * f
+    # ==========================
+    # PHRASE-BASED KEYWORDS
+    # ==========================
+    for group, phrases in PHRASE_GROUPS.items():
+        for phrase in phrases:
+            if phrase in text_l:
+                for trait, weight in KEYWORD_TRAIT_MAP[group].items():
+                    adjusted[trait] += weight
 
-    # INTROSPECTION → tingkatkan O
-    for word in INTROSPECTION:
-        if word in counter:
-            if not any(n in text.lower() for n in MENTAL_UNSTABLE_N):
-                f = counter[word]
-            adjusted["O"] += 0.35 * f
+                # alert khusus
+                if group in ["EXTREME_NEGATIVE", "MENTAL_UNSTABLE_N"]:
+                    adjusted["EXTREME_ALERT"] = True
 
-    # ACHIEVEMENT → tingkatkan C
-    for word in ACHIEVEMENT:
-        if word in counter:
-            f = counter[word]
-            adjusted["C"] += 0.5 * f
-
-    # TRUST → tingkatkan A
-    for word in TRUST:
-        if word in counter:
-            f = counter[word]
-            adjusted["A"] += 0.5 * f
-
-    # RELATIONSHIP_AFFECTION → naikkan A, sedikit turunkan N
-    for word in RELATIONSHIP_AFFECTION:
-        if word in counter:
-            f = counter[word]
-            adjusted["A"] += 0.6 * f
-            adjusted["N"] -= 0.1 * f
-
-    for word in COLLABORATION:
-        if word in counter:
-            f = counter[word]
-            adjusted["A"] += 0.9 * f   # fokus ke agreeableness
-            adjusted["E"] += 0.7 * f
-            adjusted["N"] -= 0.05 * f
-     # EXTREME_NEGATIVE → N naik lebih tinggi, E turun sedikit
-    for phrase in EXTREME_NEGATIVE:
-        if phrase in text.lower():  # periksa frasa utuh
-            adjusted["N"] += 1.0   # tingkatkan Neuroticism signifikan
-            adjusted["E"] -= 0.2   # ekstrim → lebih introvert
-            # Bisa juga set alert
-            adjusted["EXTREME_ALERT"] = True
-    # CREATIVE DISCUSSION (A-dominant)
-    for phrase in CREATIVE_DISCUSSION_A:
-        if phrase in text.lower():
-            adjusted["A"] += 0.8
-            adjusted["O"] += 0.4
-            adjusted["E"] += 0.2
-    for word in DISCIPLINE_C:
-        if word in counter:
-            f = counter[word]
-            adjusted["C"] += 0.8 * f
-    for word in EXTRAVERSION_E:
-        if word in counter:
-            f = counter[word]
-            adjusted["E"] += 0.7 * f
-            adjusted["A"] += 0.5 * f
-            adjusted["N"] -= 0.05 * f
-    for word in E_SOCIAL_DEPENDENCY:
-        if word in counter:
-            f = counter[word]
-            adjusted["E"] += 0.6 * f
-            adjusted["A"] += 0.4 * f
-            adjusted["N"] -= 0.1 * f
-    for word in EMPATHY_HARMONY_A:
-        if word in counter:
-            f = counter[word]
-            adjusted["A"] += 0.7 * f
-            adjusted["N"] -= 0.1 * f
-    # MENTAL UNSTABLE / OVERTHINKING
-    for phrase in MENTAL_UNSTABLE_N:
-        if phrase in text.lower():
-            adjusted["N"] += 8.0
-            adjusted["E"] -= 0.2
-            adjusted["O"] -= 0.1
-
-
-    # Clamp ke skala 1–5 secara lebih smooth
-    for k in adjusted:
+    # ==========================
+    # CLAMP FINAL
+    # ==========================
+    for k in OCEAN_KEYS:
         adjusted[k] = round(min(5.0, max(1.0, adjusted[k])), 3)
 
-    return max(adjusted, key=adjusted.get), adjusted
+    dominant = max(OCEAN_KEYS, key=lambda k: adjusted[k])
+    return dominant, adjusted
 
-# ==========================
-# KEYWORD → OCEAN MAPPING
-# ==========================
 KEYWORD_TRAIT_MAP = {
-    "NEGATIVE_SOCIAL": {"E": -0.2, "N": 0.5, "A": -0.1},
+    # Sosial
+    "NEGATIVE_SOCIAL": {"E": -0.2, "N": 0.4, "A": -0.1},
     "POSITIVE_SOCIAL": {"A": 0.6, "E": 0.3, "N": -0.05},
-    "EMO_POSITIVE": {"E": 0.3, "O": 0.15},
-    "EMO_NEGATIVE": {"N": 0.35, "O": 0.1},
-    "INTROSPECTION": {"O": 0.35},
-    "ACHIEVEMENT": {"C": 0.5},
-    "CREATIVE_DISCUSSION_A": {"A": 0.8, "E": 0.4, "C": 0.2, "N": -0.05},
-    "TRUST": {"A": 0.5},
-    "RELATIONSHIP_AFFECTION": {"A": 0.6, "N": -0.1},
-    "COLLABORATION": {"A": 0.8, "E": 0.5, "C": 0.2, "N": -0.05},
-    "ANGER_EMO": {"N": 0.5},
-    "SAD_EMO": {"N": 0.3, "O": 0.05},
-    "ANXIETY_EMO": {"N": 0.35, "E": -0.1},
-    "EXTREME_NEGATIVE": {"N": 1.0, "E": -0.2},
-    "DISCIPLINE_C": {"C": 0.8},
-    "EXTRAVERSION_E": {"E": 0.7, "A": 0.5, "N": -0.05},
-    "E_SOCIAL_DEPENDENCY": {"E": 0.6, "A": 0.4, "N": -0.1},
-    "EMPATHY_HARMONY_A": {"A": 0.7, "N": -0.1},
-    "MENTAL_UNSTABLE_N": {"N": 8.0, "E": -0.2, "O": -0.1},
+    "COLLABORATION": {"A": 0.8, "E": 0.5},
 
+    # Emosi
+    "EMO_POSITIVE": {"E": 0.3},
+    "EMO_NEGATIVE": {"N": 0.35},
+    "ANGER_EMO": {"N": 0.5},
+    "SAD_EMO": {"N": 0.3},
+    "ANXIETY_EMO": {"N": 0.4, "E": -0.1},
+
+    # Kepribadian inti
+    "INTROSPECTION": {"O": 0.4},
+    "ACHIEVEMENT": {"C": 0.5},
+    "DISCIPLINE_C": {"C": 0.8},   # ← DISIPLIN MURNI C
+    "TRUST": {"A": 0.5},
+    "EMPATHY_HARMONY_A": {"A": 0.7},
+
+    # Ekstroversi
+    "EXTRAVERSION_E": {"E": 0.7, "A": 0.4},
+    "E_SOCIAL_DEPENDENCY": {"E": 0.6, "A": 0.3},
+
+    # Ekstrem
+    "EXTREME_NEGATIVE": {"N": 1.2, "E": -0.2},
+    "MENTAL_UNSTABLE_N": {"N": 2.5},  # ← hanya N
 }
+
 
 # ==========================
 # EMOTIONAL KEYWORD ADJUSTMENT REFINED
