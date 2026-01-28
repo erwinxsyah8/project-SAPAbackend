@@ -359,20 +359,22 @@ EXTRAVERSION_E = [
     "suasana hidup",
     "pusat perhatian",
     "banyak orang",
+    "Suka kerja tim",
+    "Suka keramaian",
     "aktif berdiskusi","aktif berpartisipasi","aktif dalam diskusi","aktif diskusi kelompok",
     "aktif dalam kegiatan bersama","aktif dalam kegiatan kelompok","aktif dalam kegiatan sosial",
     "aktif bersosialisasi","aktif dalam acara sosial","aktif dalam lingkungan sosial",
     "aktif dalam percakapan kelompok","aktif ikut diskusi","aktif menyapa","aktif menyapa orang",
     "aktif saat berkumpul","aktif saat kerja tim","aktif saat ada acara",
     "energi meningkat saat berkumpul","energi naik saat bersama orang lain",
-    "lebih hidup kalau ada teman","lebih hidup saat bersama orang lain",
-    "lebih aktif kalau ada teman","lebih aktif saat ada teman",
+    "lebih hidup kalau ada teman","lebih hidup saat bersama orang lain","Lebih aktif saat bersama orang lain","Lebih hidup kalau ada teman","Lebih hidup saat bersama orang lain",
+    "lebih aktif kalau ada teman","lebih aktif saat ada teman","Suka berbagi pengalaman","Suka berbagi cerita","Suka berinteraksi langsung","Kalau ada acara kumpul pasti ikut","Kalau ada acara rame pasti ikut",
 
     "mudah bergaul","mudah berinteraksi","mudah membangun komunikasi",
     "mudah menjalin komunikasi","mudah nyambung kalau diajak ngobrol",
     "mudah beradaptasi secara sosial","mudah bergaul di lingkungan baru",
 
-    "senang berinteraksi","senang berinteraksi langsung","senang berinteraksi dengan orang baru",
+    "senang berinteraksi","senang berinteraksi langsung","senang berinteraksi dengan orang baru","senang bekerja bersama","senang bekerja dalam tim."
     "senang berinteraksi dengan banyak orang","senang ngobrol","senang ngobrol lama",
     "senang ngobrol panjang lebar","senang ngobrol rame","senang ngobrol santai",
     "senang berbagi cerita","senang berbagi cerita ke orang lain",
@@ -392,7 +394,132 @@ EXTRAVERSION_E = [
 
     "paling semangat kalau diskusi","paling semangat kalau ngobrol rame",
     "ngerasa lebih hidup saat ngobrol","ngerasa semangat kalau ngobrol lama",
-    "kalau ada acara kumpul pasti ikut","kalau ada acara rame pasti ikut"
+    "kalau ada acara kumpul pasti ikut","kalau ada acara rame pasti ikut",
+    "Lebih nyaman kerja tim",
+"Mudah beradaptasi secara sosial",
+"Mudah bergaul di lingkungan baru",
+"Mudah bergaul",
+"Mudah berinteraksi",
+"Ngobrol bikin ide berkembang",
+"Senang bekerja bersama tim",
+"Senang bekerja dalam tim",
+"Senang berinteraksi dengan banyak orang",
+"Mudah nyambung kalau diajak ngobrol",
+"Ngerasa lebih hidup saat ngobrol panjang",
+"Ngerasa semangat kalau ngobrol lama",
+"Paling semangat kalau diskusi bareng",
+"Paling semangat kalau lagi ngobrol rame-rame",
+"Paling suka kerja tim dibanding sendirian",
+"Senang berbagi cerita keseharian",
+"Senang ketemu teman lama",
+"Senang terlibat dalam aktivitas sosial",
+"Senang terlibat diskusi santai",
+"Suka berbagi cerita sehari-hari",
+"Suka bercanda bareng teman",
+"Suka ikut acara kumpul-kumpul",
+"Suka ngobrol meski cuma hal ringan",
+"Suka ngobrol sambil bercanda ringan",
+"Suka ngobrol sambil bercanda",
+"Lebih suka kerja bareng daripada sendiri",
+"Lebih suka kerja kelompok daripada sendiri",
+"Suka diskusi ramai dibanding kerja sendiri",
+"Kalau sendirian terlalu lama jadi gelisah",
+"Kalau suasana sepi jadi kurang semangat",
+"Cepat akrab dengan orang baru",
+"Cepat mencairkan suasana",
+"Energi meningkat saat ramai",
+"Energi naik kalau lagi kumpul bareng",
+"Ketemu orang baru itu seru",
+"Mudah akrab dengan orang baru",
+"Mudah berbaur dengan lingkungan baru",
+"Mudah memulai percakapan",
+"Mudah mencairkan suasana",
+"Ngobrol itu bikin semangat",
+"Nyaman berada di keramaian",
+"Nyaman berada di tengah keramaian",
+"Nyaman berbicara di depan banyak orang",
+"Senang berada di tengah keramaian",
+"Senang berbagi cerita",
+"Senang berbicara di depan umum",
+"Senang bertemu orang baru",
+"Senang kerja kolaboratif",
+"Senang ngobrol santai",
+"Suasana ramai bikin semangat",
+"Suka berbicara di depan umum",
+"Suka berbicara di forum",
+"Suka berbincang santai",
+"Suka jadi pusat perhatian",
+"Suka presentasi di depan umum",
+"Suka suasana ramai",
+"Ketemu banyak orang bikin energi naik",
+"Ketemu orang baru selalu bikin semangat",
+"Lebih nyaman bekerja dengan orang",
+"Lebih nyaman berada di tengah orang banyak",
+"Lebih nyaman berbicara langsung",
+"Lebih semangat kalau banyak orang",
+"Lebih semangat kalau ramai",
+"Merasa hidup saat banyak orang",
+"Mudah dekat dengan orang baru",
+"Mudah dekat dengan orang lain",
+"Mudah memulai interaksi",
+"Mudah mencairkan suasana tegang",
+"Mudah menyesuaikan diri di lingkungan baru",
+"Mudah terlibat obrolan",
+"Mudah terlibat percakapan",
+"Senang berbagi cerita lucu",
+"Senang berbincang lama",
+"Senang berdiskusi santai",
+"Senang ikut diskusi ramai",
+"Senang jadi bagian dari keramaian",
+"Senang jadi pusat perhatian",
+"Suasana ramai bikin lebih semangat",
+"Suka berdiskusi panjang",
+"Suka bertukar cerita",
+"Suka interaksi langsung",
+"Suka jadi bagian dari keramaian",
+"Suka mengobrol lama",
+"Suka suasana hidup dan ramai",
+"Suka suasana penuh interaksi",
+"Suka suasana ramai dan penuh obrolan",
+"Kalau ada obrolan seru pasti ikut nimbrung",
+"Kalau rame rasanya lebih nyaman",
+"Kalau sendirian kelamaan malah bosan",
+"Lebih betah di tempat ramai",
+"Lebih hidup kalau ada interaksi",
+"Lebih hidup saat dikelilingi orang",
+"Lebih nyaman berada di tengah orang",
+"Lebih nyaman kalau banyak orang",
+"Lebih nyaman ngomong langsung daripada chat",
+"Lebih suka suasana hidup",
+"Mudah akrab walau baru kenal",
+"Mudah berbaur di situasi baru",
+"Mudah membangun relasi",
+"Mudah membaur di lingkungan baru",
+"Mudah terlibat percakapan baru",
+"Ngerasa hidup kalau bisa ketemu banyak orang",
+"Ngerasa lebih produktif bareng orang",
+"Obrolan bikin suasana jadi hangat",
+"Obrolan panjang bikin senang",
+"Obrolan rame bikin lupa capek",
+"Obrolan santai bikin hari lebih seru",
+"Paling semangat kalau banyak interaksi",
+"Senang berada di tengah banyak orang",
+"Senang berbagi pengalaman",
+"Senang berbincang lama-lama",
+"Senang kalau bisa berbagi cerita",
+"Senang kenal orang baru di mana pun",
+"Senang terlibat dalam obrolan panjang",
+"Sering ikut nimbrung kalau ada obrolan",
+"Sering mulai percakapan duluan",
+"Suasana rame bikin mood langsung naik",
+"Suka jadi bagian dari keramaian",
+"Suka menyapa orang duluan",
+"Suka suasana penuh tawa",
+"Suka suasana yang ramai dan hangat",
+"Suka terlibat dalam obrolan ramai",
+"Susah diam kalau lagi rame"
+
+
 ]
 TRUST = [
     "peduli","menolong","percaya","percaya diri","loyal","setia","mendukung","mempercayai",
@@ -419,7 +546,7 @@ CREATIVE_DISCUSSION_A = [
     "inovasi solusi","pemikiran lintas disiplin"
 ]
 DISCIPLINE_C = [
-    "disiplin",
+  "disiplin",
   "tepat waktu",
   "tanggung jawab",
   "rapi",
@@ -439,6 +566,8 @@ DISCIPLINE_C = [
   "kerapihan",
   "komitmen",
   "target",
+  "dengan baik",
+  "ketepatan waktu",
   "hasil maksimal",
   "tidak suka menunda",
   "tidak suka asal-asalan",
@@ -451,14 +580,55 @@ DISCIPLINE_C = [
     "ketelitian","kualitas","hasil maksimal","hasil optimal","komitmen",
     "anti menunda","tidak suka menunda","tidak suka menunda pekerjaan",
     "menyelesaikan","menyelesaikan tugas","menyelesaikan pekerjaan",
-    "selesai tepat waktu","sesuai rencana","standar kerja","kerja serius",
+    "selesai tepat waktu","sesuai rencana","standar kerja","kerja serius","harus selesai","pekerjaaan setengah-setengah","sampai selesai","sampai tuntas","tertib","rencana kerja","setengah jalan",
     "pekerjaan rapi","kerja rapi","kerja terencana","kerja sistematis",
     "kerja terstruktur","kerja terorganisir","fokus bekerja",
     "cek ulang","mengecek ulang","detail","setiap detail",
     "pekerjaan tuntas","sampai selesai","tidak setengah-setengah",
     "tidak asal-asalan","tidak terburu-buru","kualitas lebih penting",
-    "menjaga kualitas","menjaga konsistensi","menjaga komitmen"
-]
+    "menjaga kualitas","menjaga konsistensi","menjaga komitmen","menghargai waktu","menghargai deadline","menghargai jadwal", "menghargai rencana", "mengatur waktu", "mengatur jadwal", "mengatur rencana", "mengatur pekerjaan"
+    "Disiplin membantu mencapai target","Disiplin membantu mencapai tujuan","Disiplin menjaga kualitas kerja","Bertanggung jawab dalam pekerjaan","Fokus pada tugas yang diberikan","Fokus untuk mencapai hasil terbaik","Menepati deadline yang ditetapkan","Konsisten dalam menyelesaikan tugas","Konsistensi dalam bekerja","Rapi dalam mengatur pekerjaan","Teratur dalam menjalankan tugas","Terstruktur dalam menyelesaikan pekerjaan","Sistematis dalam pendekatan kerja","Perencanaan yang matang sebelum bekerja","Rencana kerja yang jelas","Jadwal kerja yang teratur","Prioritas tugas yang tepat","Efisien dalam penggunaan waktu","Produktif sepanjang hari","Teliti dalam setiap detail pekerjaan","Kualitas kerja yang diutamakan","Hasil maksimal dari setiap usaha",
+    "Bertanggung jawab pada tugas", "Bertanggung jawab pada pekerjaan","Ketelitian menentukan hasil akhir","Kualitas lebih penting daripada kuantitas","Komitmen tinggi terhadap pekerjaan","Anti menunda pekerjaan penting","Menyelesaikan tugas tepat waktu","Menyelesaikan pekerjaan dengan baik","Sesuai rencana kerja yang dibuat","Konsistensi lebih penting dari kecepatan","Lebih nyaman dengan jadwal teratur","Lebih suka bekerja sesuai rencana","Mengatur pekerjaan dengan baik","Mengatur waktu dengan baik", "Mengutamakan ketepatan waktu","Selalu buat to-do list harian","Selalu buat rencana kerja mingguan","Selalu membuat perencanaan kerja","Selalu mengerjakan tugas tepat waktu","Selalu menyelesaikan tugas tepat waktu", "Selalu merencanakan pekerjaan","Tanggung jawab itu utama","Tidak suka hasil asal-asalan","Tidak suka menunda pekerjaan",
+    "Tidak suka pekerjaan asal-asalan","Tidak suka pekerjaan setengah-setengah","Tidak suka pekerjaan terbengkalai","Tidak suka pekerjaan tertunda","Tidak suka pekerjaan yang tertunda","Tidak suka menunda pekerjaan","Lebih suka kerja teratur dan rapi","Selalu membuat daftar tugas harian","Bertanggung jawab pada setiap pekerjaan","Tidak suka pekerjaan asal-asalan","Selalu mengecek ulang hasil kerja",
+"Tidak suka pekerjaan terbengkalai",
+"Kerja terencana bikin hasil maksimal",
+"Mengutamakan ketepatan waktu",
+"Tidak suka pekerjaan terburu-buru",
+"Selalu mengerjakan tugas dengan serius",
+"Menjaga kualitas lebih penting dari cepat selesai",
+"Disiplin membuat pekerjaan lebih ringan",
+"Selalu menyelesaikan pekerjaan sesuai rencana",
+"Teliti dalam setiap detail",
+"Menjaga komitmen kerja",
+"Tidak suka pekerjaan setengah-setengah",
+"Selalu bekerja dengan penuh tanggung jawab",
+"Menjaga konsistensi kinerja",
+"Mengutamakan hasil yang berkualitas",
+"Selalu memprioritaskan tugas utama",
+"Menyelesaikan pekerjaan tanpa menunda",
+"Bekerja dengan penuh tanggung jawab",
+"Menjaga kerapian pekerjaan",
+"Selalu teliti sebelum mengumpulkan pekerjaan",
+"Tidak suka pekerjaan yang asal jadi",
+"Menjaga kualitas lebih penting dari kecepatan",
+"Bertanggung jawab atas hasil kerja",
+"Selalu menyelesaikan tugas dengan baik",
+"Tidak suka menunda pekerjaan penting",
+"Menjaga konsistensi hasil kerja",
+"Bekerja sesuai rencana yang dibuat",
+"Teliti dan bertanggung jawab",
+"Disiplin membuat pekerjaan lebih efektif",
+"Menjaga kualitas hasil kerja setiap saat",
+"Fokus bekerja tanpa menunda",
+"Bertanggung jawab terhadap setiap tugas",
+"Disiplin dan konsisten dalam bekerja",
+"Tidak suka pekerjaan yang tertunda lama",
+"Bekerja secara terstruktur dan rapi",
+"Mengutamakan ketepatan dan kerapian",
+"Menjaga kualitas kerja setiap hari",
+"Disiplin adalah kebiasaan saya",
+"Selalu bertanggung jawab terhadap pekerjaan"
+]   
 # ====== MENTAL UNSTABLE / OVERTHINKING / ANXIETY CORE (NEUROTICISM)
 MENTAL_UNSTABLE_N = [
     "gugup","mudah gugup","mudah merasa gugup",
@@ -480,7 +650,42 @@ MENTAL_UNSTABLE_N = [
     "sulit merasa damai","sulit merasa nyaman",
     "sulit menenangkan diri","sulit menenangkan pikiran",
     "sulit merasa aman","sulit tenang sepenuhnya",
-    "tidak nyaman tanpa sebab","gelisah tanpa sebab"
+    "tidak nyaman tanpa sebab","gelisah tanpa sebab",
+    "Merasa tegang tanpa alasan jelas",
+"Mudah gugup dalam situasi tertentu",
+"Mudah gugup",
+"Mudah merasa tidak tenang",
+"Perasaan tidak stabil",
+"Pikiran mudah kacau",
+"Pikiran negatif sering muncul",
+"Pikiran sering negatif",
+"Sering merasa tidak tenang",
+"Sulit merasa rileks",
+"Sulit merasa tenang",
+"Tidak tenang menghadapi masalah",
+"Mudah merasa stres",
+"Mudah merasa tidak aman",
+"Pikiran negatif muncul berulang kali",
+"Pikiran negatif muncul terus-menerus",
+"Pikiran negatif sering muncul tiba-tiba",
+"Pikiran negatif sulit dikendalikan",
+"Pikiran rasanya tidak pernah tenang",
+"Pikiran sering kacau",
+"Pikiran sering mengganggu ketenangan",
+"Pikiran sering tidak tenang",
+"Pikiran sering tidak terkendali",
+"Pikiran terasa berat sepanjang hari",
+"Pikiran terasa berat sepanjang hari",
+"Sering merasa tidak aman",
+"Sulit menenangkan diri",
+"Sulit menenangkan pikiran",
+"Sulit merasa aman",
+"Sulit merasa benar-benar tenang",
+"Sulit merasa damai",
+"Sulit merasa nyaman",
+"Sulit merasa rileks walau tidak ada masalah",
+"Sulit merasa tenang sepenuhnya"
+
 ]
 
 E_SOCIAL_DEPENDENCY = [
@@ -522,7 +727,76 @@ EMPATHY_HARMONY_A = [
 
     "suasana nyaman","suasana rukun","suasana harmonis",
     "menciptakan suasana positif","menjaga suasana nyaman",
-    "tidak enak hati","tidak enak menolak bantuan"
+    "tidak enak hati","tidak enak menolak bantuan",
+    "Tidak suka melihat orang lain sedih",
+"Tidak suka membuat orang lain kecewa",
+"Empati itu penting",
+"Lebih memilih berdamai",
+"Lebih memilih kompromi",
+"Lebih memilih mengalah daripada konflik",
+"Lebih suka berdamai",
+"Lebih suka suasana damai",
+"Lebih suka suasana harmonis",
+"Menghindari konflik",
+"Menghindari pertengkaran",
+"Mengutamakan keharmonisan",
+"Mengutamakan kerja sama",
+"Mudah bekerja sama",
+"Mudah berempati pada orang lain",
+"Mudah berempati",
+"Mudah memahami perasaan orang lain",
+"Senang bekerja sama",
+"Senang melihat orang lain bahagia",
+"Senang menjaga hubungan baik",
+"Senang suasana damai",
+"Senang suasana damai",
+"Tidak enak menolak bantuan",
+"Tidak suka konflik",
+"Tidak suka menyakiti orang lain",
+"Tidak suka menyakiti orang",
+"Tidak suka menyakiti perasaan orang",
+"Tidak suka menyalahkan orang",
+"Tidak suka pertengkaran",
+"Lebih memilih kerja sama daripada bersaing",
+"Lebih memilih mengalah daripada bertengkar",
+"Lebih nyaman bekerja secara kolaboratif",
+"Lebih suka berdamai daripada bertengkar",
+"Lebih suka berdiskusi dengan damai",
+"Lebih suka kerja sama daripada konflik",
+"Lebih suka kerja yang harmonis",
+"Menghindari konflik sebisa mungkin",
+"Menghindari perselisihan",
+"Mengutamakan kebersamaan",
+"Mudah berempati pada kondisi orang lain",
+"Mudah berempati pada masalah orang lain",
+"Mudah memahami perasaan orang",
+"Mudah memahami sudut pandang orang lain",
+"Mudah merasa iba pada orang lain",
+"Mudah merasa iba",
+"Mudah merasa simpati",
+"Mudah tersentuh dengan cerita orang",
+"Selalu berusaha bersikap adil",
+"Selalu berusaha bersikap baik",
+"Selalu berusaha memahami perasaan orang lain",
+"Selalu berusaha menjadi pendengar yang baik",
+"Selalu berusaha menjaga perasaan orang",
+"Selalu mencoba memahami orang lain",
+"Senang bekerja dalam suasana akrab",
+"Senang membantu tanpa mengharapkan balasan",
+"Senang menciptakan suasana positif",
+"Suka menciptakan suasana harmonis",
+"Suka menjaga suasana tetap nyaman",
+"Suka suasana penuh kerja sama",
+"Suka suasana yang rukun",
+"Tidak enak hati kalau menyakiti orang",
+"Tidak suka konflik berkepanjangan",
+"Tidak suka konflik dengan siapa pun",
+"Tidak suka menyakiti hati orang lain",
+"Tidak suka menyakiti perasaan orang lain",
+"Tidak suka menyakiti siapa pun",
+"Tidak suka menyalahkan orang lain",
+"Tidak tega melihat orang kesulitan"
+
 ]
 # ====== INTROSPECTION / ANALYTICAL / OCEAN
 INTROSPECTION = [
@@ -531,7 +805,7 @@ INTROSPECTION = [
     "filosofis","menghayati","meneliti","mendalami","menafsirkan","merenungi","observasi","perenungan",
     "pemikiran mendalam","kritis","analisis","evaluasi","menganalisis","mempertimbangkan","memeriksa","menguji",
     "analitis","rasional","logis","problem solving","menganalisis data",
-    "observasi mendalam","pemikiran kritis","refleksi mendalam","analisis terperinci"
+    "observasi mendalam","pemikiran kritis","refleksi mendalam","analisis terperinci","belajar","studi","mempelajari","membaca","meneliti"
 ]
 
 # ====== ACHIEVEMENT / DISCIPLINE / PRODUCTIVITY
@@ -541,7 +815,7 @@ ACHIEVEMENT = [
     "terorganisir","mengikuti aturan","persisten","berorientasi hasil","bertekad","kemauan keras",
     "capai target","usaha maksimal","hasil maksimal","hasil optimal","pencapaian","goal oriented",
     "proaktif","inisiatif","mandiri","berinisiatif","work hard","determinasi",
-    "menyelesaikan tugas tepat waktu","produktif tinggi","komitmen penuh","mencapai milestone","berorientasi prestasi"
+    "menyelesaikan tugas tepat waktu","produktif tinggi","komitmen penuh","mencapai milestone","berorientasi prestasi", "belajar","mempelajari","meneliti"
 ]
 COLLABORATION = [
     "bekerja sama","teamwork","kolaborasi","bersama","kooperatif","mendukung tim",
@@ -560,14 +834,11 @@ EXTREME_NEGATIVE = [
 EXTREME_NEGATIVE += [f"ter{w}" for w in ["tekan","putus asa","stres","sakit"]]
 EXTREME_NEGATIVE += [f"me{w}" for w in ["mati","bunuh","menyerah"]]
 
-
-
 # ==========================
 # OCEAN ADJUSTMENT REFINED
 # ==========================
 from collections import Counter
 import re
-
 def adjust_ocean_by_keywords(scores: dict, text: str):
     adjusted = scores.copy()
     counter = Counter(re.findall(r'\w+', text.lower()))
@@ -584,31 +855,30 @@ def adjust_ocean_by_keywords(scores: dict, text: str):
     for word in POSITIVE_SOCIAL:
         if word in counter:
             f = counter[word]
-            adjusted["A"] += 0.4 * f   # fokus ke agreeableness
+            adjusted["A"] += 0.4 * f
             adjusted["E"] += 0.3 * f
             adjusted["N"] -= 0.05 * f
 
-
-    # EMO_POSITIVE → tingkatkan E & O
+    # EMO_POSITIVE → tingkatkan E & O (turunkan O 0.85x)
     for word in EMO_POSITIVE:
         if word in counter:
             f = counter[word]
             adjusted["E"] += 0.3 * f
-            adjusted["O"] += 0.15 * f
+            adjusted["O"] += 0.15 * f * 0.85
 
-    # EMO_NEGATIVE → tingkatkan N & sedikit O
+    # EMO_NEGATIVE → tingkatkan N & sedikit O (turunkan O 0.85x)
     for word in EMO_NEGATIVE:
         if word in counter:
             f = counter[word]
             adjusted["N"] += 0.35 * f
-            adjusted["O"] += 0.1 * f
+            adjusted["O"] += 0.1 * f * 0.85
 
-    # INTROSPECTION → tingkatkan O
+    # INTROSPECTION → tingkatkan O (turunkan O 0.80x)
     for word in INTROSPECTION:
         if word in counter:
+            f = counter[word]
             if not any(n in text.lower() for n in MENTAL_UNSTABLE_N):
-                f = counter[word]
-            adjusted["O"] += 0.35 * f
+                adjusted["O"] += 0.35 * f * 0.8
 
     # ACHIEVEMENT → tingkatkan C
     for word in ACHIEVEMENT:
@@ -632,52 +902,57 @@ def adjust_ocean_by_keywords(scores: dict, text: str):
     for word in COLLABORATION:
         if word in counter:
             f = counter[word]
-            adjusted["A"] += 0.9 * f   # fokus ke agreeableness
+            adjusted["A"] += 0.9 * f
             adjusted["E"] += 0.7 * f
             adjusted["N"] -= 0.05 * f
-     # EXTREME_NEGATIVE → N naik lebih tinggi, E turun sedikit
+
+    # EXTREME_NEGATIVE → N naik lebih tinggi, E turun sedikit
     for phrase in EXTREME_NEGATIVE:
-        if phrase in text.lower():  # periksa frasa utuh
-            adjusted["N"] += 1.0   # tingkatkan Neuroticism signifikan
-            adjusted["E"] -= 0.2   # ekstrim → lebih introvert
-            # Bisa juga set alert
+        if phrase in text.lower():
+            adjusted["N"] += 1.0
+            adjusted["E"] -= 0.2
             adjusted["EXTREME_ALERT"] = True
-    # CREATIVE DISCUSSION (A-dominant)
+
+    # CREATIVE DISCUSSION (A-dominant) → turunkan O 0.85x
     for phrase in CREATIVE_DISCUSSION_A:
         if phrase in text.lower():
-            adjusted["A"] += 0.8
-            adjusted["O"] += 0.4
+            adjusted["A"] -= 0.3
+            adjusted["O"] += 0.4 * 0.85
             adjusted["E"] += 0.2
+
     for word in DISCIPLINE_C:
         if word in counter:
             f = counter[word]
-            adjusted["C"] += 0.8 * f
+            adjusted["C"] += 1.2 * f
+            adjusted["O"] -= 0.4
+
     for word in EXTRAVERSION_E:
         if word in counter:
             f = counter[word]
             adjusted["E"] += 0.7 * f
             adjusted["A"] += 0.3 * f
             adjusted["N"] -= 0.05 * f
-    for word in E_SOCIAL_DEPENDENCY:
-        if word in counter:
-            f = counter[word]
-            adjusted["E"] += 0.6 * f
-            adjusted["A"] += 0.3 * f
-            adjusted["N"] -= 0.1 * f
+
+    for phrase in E_SOCIAL_DEPENDENCY + ACHIEVEMENT + EXTRAVERSION_E:
+        if phrase.lower() in text.lower():
+            adjusted["E"] += 0.6
+            adjusted["A"] -= 0.7
+            adjusted["O"] -= 0.8
+
     for word in EMPATHY_HARMONY_A:
         if word in counter:
             f = counter[word]
             adjusted["A"] += 0.7 * f
             adjusted["N"] -= 0.1 * f
-    # MENTAL UNSTABLE / OVERTHINKING
+
+    # MENTAL UNSTABLE / OVERTHINKING → turunkan O 0.75x
     for phrase in MENTAL_UNSTABLE_N:
         if phrase in text.lower():
             adjusted["N"] += 8.0
             adjusted["E"] -= 0.2
-            adjusted["O"] -= 0.1
+            adjusted["O"] += -0.1 * 0.75
 
-
-    # Clamp ke skala 1–5 secara lebih smooth
+    # Clamp ke skala 1–5
     for k in adjusted:
         adjusted[k] = round(min(5.0, max(1.0, adjusted[k])), 3)
 
@@ -701,8 +976,8 @@ KEYWORD_TRAIT_MAP = {
     "SAD_EMO": {"N": 0.3, "O": 0.05},
     "ANXIETY_EMO": {"N": 0.35, "E": -0.1},
     "EXTREME_NEGATIVE": {"N": 1.0, "E": -0.2},
-    "DISCIPLINE_C": {"C": 0.8},
-    "EXTRAVERSION_E": {"E": 0.7, "A": 0.5, "N": -0.05},
+    "DISCIPLINE_C": {"C": 1.2, "O": -0.4},
+    "EXTRAVERSION_E": {"E": 0.6, "A": -0.7, "O": -0.8},
     "E_SOCIAL_DEPENDENCY": {"E": 0.6, "A": 0.4, "N": -0.1},
     "EMPATHY_HARMONY_A": {"A": 0.7, "N": -0.1},
     "MENTAL_UNSTABLE_N": {"N": 8.0, "E": -0.2, "O": -0.1},
@@ -712,338 +987,226 @@ KEYWORD_TRAIT_MAP = {
 # ==========================
 # EMOTIONAL KEYWORD ADJUSTMENT REFINED
 # ==========================
-def apply_emotional_keyword_adjustment(text: str, scores: dict):
+def apply_emotional_keyword_adjustment(text: str, scores: dict, o_reduce: float = 0.5):
+    """
+    Adjust OCEAN scores based on emotional keywords.
+    o_reduce: angka positif, O akan dikurangi o_reduce poin dari nilai sebelumnya
+    """
     adjusted = scores.copy()
-    counter = Counter(re.findall(r'\w+', text.lower()))
+    text_lower = text.lower()
+    tokens = re.findall(r'\w+', text_lower)
+    counter = Counter(tokens)
 
-    # ANGER → kuatkan N, tidak ubah O
-    for word in ANGER_EMO:
-        if word in counter:
-            f = counter[word]
-            adjusted["N"] += 0.5 * f
-
-    # SADNESS → naikkan N & sedikit O
-    for word in SAD_EMO:
-        if word in counter:
+    # ==========================
+    # KATA EMOSI NEGATIF → Naikkan N
+    # ==========================
+    for word in ANGER_EMO + SAD_EMO + ANXIETY_EMO + EMO_NEGATIVE + NEGATIVE_SOCIAL + MENTAL_UNSTABLE_N:
+        if word in tokens:
             f = counter[word]
             adjusted["N"] += 0.3 * f
-            adjusted["O"] += 0.05 * f
+            if word in ANXIETY_EMO:
+                adjusted["E"] -= 0.1 * f
+            if word in SAD_EMO:
+                adjusted["O"] += 0.05 * f
 
-    # ANXIETY → naikkan N, turunkan E sedikit
-    for word in ANXIETY_EMO:
-        if word in counter:
+    # ==========================
+    # KATA EMOSI POSITIF → Naikkan A/E/O & turunkan N sedikit
+    # ==========================
+    for word in EMO_POSITIVE + POSITIVE_SOCIAL + COLLABORATION + ACHIEVEMENT + TRUST + RELATIONSHIP_AFFECTION + EXTRAVERSION_E + E_SOCIAL_DEPENDENCY + EMPATHY_HARMONY_A + CREATIVE_DISCUSSION_A + DISCIPLINE_C + INTROSPECTION:
+        if word in tokens:
             f = counter[word]
-            adjusted["N"] += 0.35 * f
-            adjusted["E"] -= 0.1 * f
+            if word in EMO_POSITIVE + POSITIVE_SOCIAL + COLLABORATION:
+                adjusted["A"] += 0.35 * f
+                adjusted["N"] -= 0.1 * f
+            if word in EXTRAVERSION_E + E_SOCIAL_DEPENDENCY + CREATIVE_DISCUSSION_A:
+                adjusted["O"] += 0.55 * f
+                adjusted["E"] += 0.35 * f
+                adjusted["A"] -= 0.35 * f
+            if word in ACHIEVEMENT + DISCIPLINE_C + INTROSPECTION + TRUST + EMPATHY_HARMONY_A:
+                adjusted["E"] += 0.45 * f
+                adjusted["O"] += 0.45 * f
+                adjusted["N"] -= 0.45 * f
 
-     # Social, Achievement, Trust, Relationship
-    for group_name, keywords in {
-        "NEGATIVE_SOCIAL": NEGATIVE_SOCIAL,
-        "POSITIVE_SOCIAL": POSITIVE_SOCIAL,
-        "EMO_POSITIVE": EMO_POSITIVE,
-        "EMO_NEGATIVE": EMO_NEGATIVE,
-        "INTROSPECTION": INTROSPECTION,
-        "ACHIEVEMENT": ACHIEVEMENT,
-        "TRUST": TRUST,
-        "RELATIONSHIP_AFFECTION": RELATIONSHIP_AFFECTION,
-        "COLLABORATION": COLLABORATION,
-        "CREATIVE_DISCUSSION_A": CREATIVE_DISCUSSION_A,
-        "DISCIPLINE_C": DISCIPLINE_C,
-        "EXTRAVERSION_E": EXTRAVERSION_E,
-        "E_SOCIAL_DEPENDENCY": E_SOCIAL_DEPENDENCY,
-        "EMPATHY_HARMONY_A": EMPATHY_HARMONY_A,
-        "MENTAL_UNSTABLE_N": MENTAL_UNSTABLE_N,
-    }.items():
-        for word in keywords:
-            if word in counter:
-                f = math.log(1 + counter[word])
-                for trait, weight in KEYWORD_TRAIT_MAP.get(group_name, {}).items():
-                    adjusted[trait] += weight * f
+    # ==========================
+    # Kata spesifik override ringan → turunkan N
+    # ==========================
+    light_positive_words = ["suka", "senang", "belajar", "bahagia", "ceria", "menyenangkan"]
+    for word in light_positive_words:
+        if word in tokens:
+            adjusted["N"] = max(1.0, adjusted["N"] - 0.5)
 
-    # Clamp ke skala 1–5
-    for k in ["O","C","E","A","N"]:  # jangan clamp EXTREME_ALERT
+    # ==========================
+    # TURUNKAN Openness dengan jumlah tetap
+    # ==========================
+    adjusted["O"] = max(1.0, round(adjusted["O"] - o_reduce, 3))
+
+    # ==========================
+    # Clamp trait lain ke skala 1–5
+    # ==========================
+    for k in ["C", "E", "A", "N"]:
         adjusted[k] = round(min(5.0, max(1.0, adjusted[k])), 3)
 
     return adjusted
 
-def determine_dominant_trait(scores, text):
-    # Hitung E/A/N untuk konteks sosial
-    social_hits = sum(1 for w in POSITIVE_SOCIAL+COLLABORATION if w in text.lower())
-    emo_hits = sum(1 for w in EMO_POSITIVE if w in text.lower())
 
-    # Jika banyak kata kolaborasi → dominan A
+# ==========================
+# DOMINANT TRAIT SEDERHANA
+# ==========================
+def determine_dominant_trait(scores, text):
+    """
+    Pilih trait dominan berdasarkan skor tertinggi,
+    tapi override jika kata positif dominan.
+    """
+    text_lower = text.lower()
+    tokens = re.findall(r'\w+', text_lower)
+
+    # Hitung kata positif
+    social_hits = sum(1 for w in POSITIVE_SOCIAL + COLLABORATION if w in tokens)
+    emo_hits = sum(1 for w in EMO_POSITIVE if w in tokens)
+    achievement_hits = sum(1 for w in ACHIEVEMENT + DISCIPLINE_C if w in tokens)
+    light_hits = sum(1 for w in ["suka", "senang", "belajar", "bahagia", "ceria"] if w in tokens)
+
     if social_hits >= 1:
         return "A"
     if emo_hits >= 1:
         return "E"
+    if achievement_hits >= 1 or light_hits >= 1:
+        return "O"
+
+    # Default: trait tertinggi
     return max(scores, key=scores.get)
+import re
+from collections import Counter
 
 # ==========================
-# HIGHLIGHT
+# HIGHLIGHT YANG AKURAT
 # ==========================
 def highlight_keywords_in_text(text: str, evidence: dict):
+    """
+    Memberikan highlight kata-kata yang ditemukan di evidence.
+    """
     tokens = re.findall(r'\w+|\W+', text)
     highlights = set()
 
-    for items in evidence.values():
+    # Ambil semua kata bukti dari evidence
+    for key, items in evidence.items():
         for e in items:
-            highlights.update([t.lower() for t in e["matched_tokens"]])
+            matched = e.get("matched_tokens", [])
+            highlights.update([t.lower() for t in matched])
 
-    result = ""
-    for t in tokens:
-        result += f"<mark>{t}</mark>" if t.lower() in highlights else t
+    # Bangun teks dengan <mark>
+    result = "".join(f"<mark>{t}</mark>" if t.lower() in highlights else t for t in tokens)
     return result
 
+
 # ==========================
-# SUPER EXPLANATION (UPDATE EXTREME ALERT)
+# SUPER EXPLANATION YANG DISERDERHANAKAN
 # ==========================
 def extract_keywords(text, top_n=5):
-    return [w for w,_ in Counter(re.findall(r'\w+', text.lower())).most_common(top_n)]
+    """
+    Ambil kata paling sering muncul sebagai highlight
+    """
+    return [w for w, _ in Counter(re.findall(r'\w+', text.lower())).most_common(top_n)]
 
 def generate_explanation_suggestion_super(text, adjusted, evidence):
+    """
+    Buat penjelasan dan saran berdasarkan adjusted scores & evidence
+    """
     dominant = max(adjusted, key=adjusted.get)
     words = extract_keywords(text)
     snippet = ", ".join(words[:3])
 
-    # Peringatan jika kalimat ekstrem
-    if adjusted.get("EXTREME_ALERT"):
+    # Peringatan jika ada EXTREME_ALERT
+    if adjusted.get("EXTREME_ALERT", 0) > 0:
         explanation = (
-            f"⚠ Kalimat ini mengandung indikasi emosional ekstrem / suicidal. "
-            f"Kecenderungan trait {dominant} tetap terlihat, tetapi terdapat risiko tinggi. "
+            f"⚠ Kalimat ini mengandung indikasi emosional ekstrem / risiko tinggi. "
+            f"Kecenderungan trait {dominant} tetap terlihat. "
             f"Kata-kata seperti {snippet} menunjukkan hal tersebut."
         )
         suggestion = (
-            f"Sangat disarankan untuk segera memperhatikan kondisi ini dan memberikan dukungan psikologis. "
-            f"Mengamati kata-kata seperti {snippet} dapat membantu mencegah risiko lebih lanjut."
+            f"Sangat disarankan untuk memberikan perhatian atau dukungan psikologis segera. "
+            f"Memantau kata-kata seperti {snippet} dapat membantu mengurangi risiko."
         )
     else:
         explanation = (
             f"Kalimat ini menunjukkan kecenderungan {dominant} karena kata-kata seperti {snippet} menandai pola tersebut."
         )
         suggestion = (
-            f"Mengamati dan menindaklanjuti hal seperti {snippet} dapat membantu mengoptimalkan trait {dominant}."
+            f"Mengamati hal seperti {snippet} dapat membantu memahami dan mengoptimalkan trait {dominant}."
         )
 
     return explanation, suggestion
 
-def determine_dominant_contextual(adjusted, evidence):
-    sorted_traits = sorted(adjusted.items(), key=lambda x: x[1], reverse=True)
-    top_trait, top_score = sorted_traits[0]
 
-    # Hitung jumlah bukti sosial / positif
-    social_hits = len(evidence.get("POSITIVE_SOCIAL", []))
+# ==========================
+# DOMINANT CONTEXTUAL YANG DISERDERHANAKAN
+# ==========================
+def determine_dominant_contextual(adjusted, evidence):
+    """
+    Pilih trait dominan berdasarkan skor tertinggi, tapi override jika ada bukti sosial/emosi positif
+    """
+    # Hitung jumlah bukti sosial / emosional
+    social_hits = len(evidence.get("POSITIVE_SOCIAL", [])) + len(evidence.get("COLLABORATION", []))
     emo_hits = len(evidence.get("EMO_POSITIVE", []))
 
     if social_hits >= 2:
-        return "E"
-    if emo_hits >= 2:
         return "A"
+    if emo_hits >= 2:
+        return "E"
 
-    return top_trait
-
+    # Default: trait tertinggi
+    sorted_traits = sorted(adjusted.items(), key=lambda x: x[1], reverse=True)
+    return sorted_traits[0][0]  # trait dengan skor tertinggi
 PERSONA_RULES = [
-    # ================= EMOSI NEGATIF =================
-    (
-        "Cemas & Pikiran Tidak Tenang",
-        lambda s: s["N"] >= 3.6,
-        "mudah gugup, sulit merasa tenang, dan sering diliputi pikiran negatif"
-    ),
-    (
-        "Overthinking Emosional",
-        lambda s: s["N"] >= 3.5 and s["O"] <= 3.2,
-        "pikiran sulit dikendalikan, sering cemas, dan kurang stabil secara emosi"
-    ),
-    (
-        "Rentan Stres",
-        lambda s: s["N"] >= 3.4 and s["C"] <= 3.0,
-        "mudah tertekan oleh situasi dan membutuhkan manajemen stres yang baik"
-    ),
-    (
-        "Empatik & Penjaga Harmoni",
-        lambda s: s["A"] >= 3.7,
-        "peduli, mudah memahami perasaan orang lain, dan mengutamakan keharmonisan"
-    ),
-    (
-        "Pendamai Alami",
-        lambda s: s["A"] >= 3.6 and s["N"] <= 3.2,
-        "menghindari konflik, memilih kompromi, dan menciptakan suasana damai"
-    ),
-    (
-        "Kolaborator Hangat",
-        lambda s: s["A"] >= 3.5 and s["E"] >= 3.0,
-        "mudah bekerja sama, suportif, dan menjaga hubungan interpersonal"
-    ),
-    (
-        "Pendengar yang Baik",
-        lambda s: s["A"] >= 3.4 and s["O"] <= 3.2,
-        "lebih fokus pada perasaan manusia daripada perdebatan ide"
-    ),
-    (
-        "Sosial Aktif",
-        lambda s: s["E"] >= 3.6,
-        "energik, aktif berinteraksi, dan merasa hidup saat bersama orang lain"
-    ),
-    (
-        "Penggerak Diskusi",
-        lambda s: s["E"] >= 3.5 and s["O"] >= 3.0,
-        "suka berdiskusi, memancing ide, dan menjaga dinamika percakapan"
-    ),
-    (
-        "Team Energizer",
-        lambda s: s["E"] >= 3.4 and s["C"] >= 3.0,
-        "menghidupkan suasana tim dan mendorong kolaborasi aktif"
-    ),
-    (
-        "Ekstrovert Sosial",
-        lambda s: s["E"] >= 3.8 and s["N"] <= 3.0,
-        "percaya diri, mudah bergaul, dan nyaman di lingkungan sosial"
-    ),
-    (
-        "Disiplin & Bertanggung Jawab",
-        lambda s: s["C"] >= 3.8,
-        "terstruktur, konsisten, fokus pada kualitas, dan dapat diandalkan"
-    ),
-    (
-        "Perfeksionis Terstruktur",
-        lambda s: s["C"] >= 3.6 and s["N"] <= 3.2,
-        "menjaga standar tinggi, rapi, dan tidak mentoleransi pekerjaan asal-asalan"
-    ),
-    (
-        "Manajer Tugas Andal",
-        lambda s: s["C"] >= 3.5 and s["E"] >= 3.0,
-        "mampu mengatur pekerjaan, waktu, dan tanggung jawab secara efektif"
-    ),
-    (
-        "Pekerja Sistematis",
-        lambda s: s["C"] >= 3.4 and s["O"] <= 3.2,
-        "lebih nyaman dengan rencana jelas, alur kerja pasti, dan target terukur"
-    ),
-    (
-        "Sensitif Emosional",
-        lambda s: s["N"] >= 3.6 and s["N"] >= s["O"] + 0.2,
-        "emosional, peka, dan mudah terpengaruh suasana"
-    ),
-    (
-        "Kolaborator Intelektual",
-        lambda s: s["A"] >= 3.6 and s["O"] >= 3.4,
-        "terbuka terhadap ide, menyukai diskusi mendalam, dan nyaman berkolaborasi lintas perspektif"
-    ),
-    (
-        "Pemikir Terbuka & Solutif",
-        lambda s: s["A"] >= 3.5 and s["O"] >= 3.5 and s["C"] >= 3.0,
-        "menggabungkan empati, kreativitas, dan logika untuk menemukan solusi bersama"
-    ),
-    (
-        "Idealis Kolaboratif",
-        lambda s: s["A"] >= 3.7 and s["O"] >= 3.6 and s["N"] <= 3.2,
-        "berorientasi nilai, menyukai dialog intelektual, dan membangun inovasi secara kolektif"
-    ),
+    # ===== EMOSI NEGATIF =====
+    ("Cemas & Pikiran Tidak Tenang", lambda s: s["N"] >= 3.6, "mudah gugup, sulit tenang, sering pikiran negatif"),
+    ("Overthinking Emosional", lambda s: s["N"] >= 3.5 and s["O"] <= 3.2, "pikiran sulit dikendalikan, sering cemas"),
+    ("Rentan Stres", lambda s: s["N"] >= 3.4 and s["C"] <= 3.0, "mudah tertekan, butuh manajemen stres"),
+    ("Tempramental", lambda s: s["N"] >= 4.0, "cepat marah, impulsif, reaktif"),
+    ("Cemas & Overthinking", lambda s: s["N"] >= 3.5 and s["E"] <= 3.0, "mudah khawatir dan gelisah"),
+    ("Melankolis", lambda s: s["N"] >= 3.2 and s["O"] >= 3.0 and s["E"] <= 3.2, "sering merenung, introspektif"),
 
-    (
-        "Tempramental",
-        lambda s: s["N"] >= 4.0,
-        "cepat marah, impulsif, dan reaktif terhadap frustrasi"
-    ),
-    (
-        "Cemas & Overthinking",
-        lambda s: s["N"] >= 3.5 and s["E"] <= 3.0,
-        "mudah khawatir, berpikir berlebihan, dan gelisah"
-    ),
-    (
-        "Sedih / Melankolis",
-        lambda s: s["N"] >= 3.2 and s["O"] >= 3.0 and s["E"] <= 3.2,
-        "sering merenung, mudah merasa kehilangan, dan introspektif"
-    ),
+    # ===== EMOSI POSITIF =====
+    ("Empatik & Penjaga Harmoni", lambda s: s["A"] >= 3.7, "peduli, mudah memahami orang lain"),
+    ("Pendamai Alami", lambda s: s["A"] >= 3.6 and s["N"] <= 3.2, "menghindari konflik, menciptakan damai"),
+    ("Kolaborator Hangat", lambda s: s["A"] >= 3.5 and s["E"] >= 3.0, "mudah bekerja sama dan suportif"),
+    ("Sosial Aktif", lambda s: s["E"] >= 3.6, "energik dan aktif berinteraksi"),
+    ("Penggerak Diskusi", lambda s: s["E"] >= 3.5 and s["O"] >= 3.0, "suka berdiskusi dan memancing ide"),
+    ("Ekstrovert Sosial", lambda s: s["E"] >= 3.8 and s["N"] <= 3.0, "percaya diri, mudah bergaul"),
+    ("Romantis", lambda s: s["A"] >= 3.4 and s["A"] >= s["O"] + 0.2, "hangat dan berorientasi hubungan"),
+    ("Ramah Sosial", lambda s: s["E"] >= 3.5 and s["A"] >= 3.2, "ceria, mudah bergaul"),
+    ("Empatik", lambda s: s["A"] >= 3.5 and s["N"] <= 3.2, "peduli dan suportif"),
+    ("Visioner Kreatif", lambda s: s["O"] >= 3.7 and s["O"] >= s["A"] + 0.2, "imajinatif, terbuka terhadap ide baru"),
+    ("Inovator", lambda s: s["O"] >= 3.5 and s["C"] >= 3.0 and s["E"] >= 3.0, "kreatif dan berpikir out-of-the-box"),
 
-    # ================= EMOSI POSITIF =================
-    (
-        "Romantis",
-        lambda s: s["A"] >= 3.4 and s["A"] >= s["O"] + 0.2,
-        "hangat, penuh afeksi, dan berorientasi hubungan"
-    ),
-    (
-        "Ramah Sosial",
-        lambda s: s["E"] >= 3.5 and s["A"] >= 3.2,
-        "ceria, mudah bergaul, dan menyukai interaksi sosial"
-    ),
-    (
-        "Empatik",
-        lambda s: s["A"] >= 3.5 and s["N"] <= 3.2,
-        "peduli, memahami perasaan orang lain, dan suportif"
-    ),
-    (
-        "Kritik & Kritis",
-        lambda s: s["O"] >= 3.7 and s["C"] >= 3.2,
-        "analitis, kritis, dan memperhatikan detail"
-    ),
-    (
-        "Visioner Kreatif",
-        lambda s: s["O"] >= 3.7 and s["O"] >= s["A"] + 0.2,
-        "imajinatif, reflektif, dan terbuka terhadap ide baru"
-    ),
-    (
-        "Inovator",
-        lambda s: s["O"] >= 3.5 and s["C"] >= 3.0 and s["E"] >= 3.0,
-        "selalu mencari cara baru, kreatif, dan berpikir out-of-the-box"
-    ),
+    # ===== PENCAPAIAN & DISCIPLIN =====
+    ("Perfeksionis", lambda s: s["C"] >= 3.6 and s["C"] >= s["N"] + 0.2, "terstruktur, disiplin, berorientasi pencapaian"),
+    ("Ambisius", lambda s: s["C"] >= 3.5 and s["O"] >= 3.5, "proaktif dan berinisiatif"),
+    ("Gigih & Persisten", lambda s: s["C"] >= 3.4 and s["N"] <= 3.2, "konsisten dan berdedikasi"),
+    ("Pragmatis", lambda s: s["C"] >= 3.2 and s["E"] >= 3.2, "praktis dan fokus pada hasil"),
 
-    # ================= PENCAPAIAN & DISCIPLIN =================
-    (
-        "Perfeksionis",
-        lambda s: s["C"] >= 3.6 and s["C"] >= s["N"] + 0.2,
-        "terstruktur, disiplin, dan berorientasi pencapaian"
-    ),
-    (
-        "Ambisius",
-        lambda s: s["C"] >= 3.5 and s["O"] >= 3.5,
-        "berorientasi tujuan, proaktif, dan berinisiatif"
-    ),
-    (
-        "Gigih & Persisten",
-        lambda s: s["C"] >= 3.4 and s["N"] <= 3.2,
-        "konsisten, tidak mudah menyerah, dan berdedikasi"
-    ),
-    (
-        "Pragmatis",
-        lambda s: s["C"] >= 3.2 and s["E"] >= 3.2,
-        "praktis, realistis, dan fokus pada hasil"
-    ),
+    # ===== KOLABORATOR =====
+    ("Kolaborator", lambda s: s["A"] >= 3.5 and s["E"] >= 3.2 and s["C"] >= 3.0, "mampu bekerja sama dan membangun harmoni"),
+    ("Mediator", lambda s: s["A"] >= 3.3 and s["N"] <= 3.2 and s["E"] >= 3.0, "tenang dan diplomatis"),
+    ("Pemimpin Visioner", lambda s: s["O"] >= 3.6 and s["C"] >= 3.5 and s["E"] >= 3.2, "memimpin tim dan strategis"),
 
-    # ================= KOLABORATOR =================
-    (
-        "Kolaborator",
-        lambda s: s["A"] >= 3.5 and s["E"] >= 3.2 and s["C"] >= 3.0,
-        "mampu bekerja sama, mendukung tim, dan membangun harmoni"
-    ),
-    (
-        "Mediator",
-        lambda s: s["A"] >= 3.3 and s["N"] <= 3.2 and s["E"] >= 3.0,
-        "menjembatani konflik, tenang, dan diplomatis"
-    ),
-    (
-        "Pemimpin Visioner",
-        lambda s: s["O"] >= 3.6 and s["C"] >= 3.5 and s["E"] >= 3.2,
-        "mengambil inisiatif, memimpin tim, dan strategis"
-    ),
-
-    # ================= KEPRIBADIAN SEIMBANG =================
-    (
-        "Seimbang",
-        lambda s: 2.8 <= s["O"] <= 3.5 and 2.8 <= s["C"] <= 3.5 and 2.8 <= s["E"] <= 3.5 and 2.8 <= s["A"] <= 3.5 and 2.8 <= s["N"] <= 3.5,
-        "adaptif, fleksibel, dan tidak ekstrem pada satu trait"
-    )
+    # ===== KEPRIBADIAN SEIMBANG =====
+    ("Seimbang", lambda s: all(2.8 <= s[k] <= 3.5 for k in ["O","C","E","A","N"]), "adaptif, fleksibel, tidak ekstrem"),
 ]
+
+
+# ==========================
+# GLOBAL CONCLUSION
+# ==========================
 def generate_global_conclusion(avg, dominant):
     O, C, E, A, N = avg["O"], avg["C"], avg["E"], avg["A"], avg["N"]
 
-    # ================= KESIMPULAN =================
     conclusion = (
-        f"Secara keseluruhan, hasil analisis menunjukkan bahwa trait kepribadian "
-        f"yang paling dominan adalah {dominant}. Individu ini cenderung "
+        f"Secara keseluruhan, trait kepribadian paling dominan adalah {dominant}. Individu ini cenderung "
     )
 
     if dominant == "O":
-        conclusion += "memiliki tingkat keterbukaan tinggi terhadap ide baru, reflektif, dan kreatif."
+        conclusion += "kreatif, reflektif, dan terbuka terhadap ide baru."
     elif dominant == "C":
         conclusion += "terstruktur, disiplin, konsisten, dan bertanggung jawab."
     elif dominant == "E":
@@ -1057,33 +1220,20 @@ def generate_global_conclusion(avg, dominant):
     if N < 0.35:
         conclusion += " Tingkat kestabilan emosi tergolong baik."
     elif N > 0.6:
-        conclusion += " Namun terdapat kecenderungan emosi negatif yang cukup tinggi."
+        conclusion += " Terdapat kecenderungan emosi negatif yang cukup tinggi."
 
     # ================= SARAN =================
     suggestion = "Disarankan untuk "
-
     if dominant == "C":
-        suggestion += (
-            "memanfaatkan kemampuan perencanaan dan kedisiplinan dalam pekerjaan atau studi, "
-            "namun tetap melatih fleksibilitas agar tidak terlalu kaku."
-        )
+        suggestion += "memanfaatkan kemampuan perencanaan dan kedisiplinan, tetapi tetap fleksibel."
     elif dominant == "O":
-        suggestion += (
-            "menyalurkan kreativitas ke aktivitas produktif seperti riset, inovasi, dan eksplorasi ide baru."
-        )
+        suggestion += "menyalurkan kreativitas ke aktivitas produktif dan eksplorasi ide."
     elif dominant == "E":
-        suggestion += (
-            "mengoptimalkan kemampuan komunikasi dan kepemimpinan dalam kerja tim, "
-            "serta melatih kemampuan refleksi diri."
-        )
+        suggestion += "mengoptimalkan kemampuan komunikasi, kepemimpinan, dan refleksi diri."
     elif dominant == "A":
-        suggestion += (
-            "mempertahankan sikap empati sambil belajar bersikap lebih tegas dalam pengambilan keputusan."
-        )
+        suggestion += "mempertahankan empati sambil belajar bersikap tegas saat dibutuhkan."
     elif dominant == "N":
-        suggestion += (
-            "melatih regulasi emosi melalui manajemen stres, mindfulness, atau journaling secara rutin."
-        )
+        suggestion += "melatih regulasi emosi melalui manajemen stres, mindfulness, atau journaling rutin."
 
     return conclusion, suggestion
 OCEAN_COLORS = {
