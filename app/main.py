@@ -567,121 +567,198 @@ EXTREME_NEGATIVE += [f"me{w}" for w in ["mati","bunuh","menyerah"]]
 # ==========================
 from collections import Counter
 import re
+import math
 
+# ==========================
+# HELPER
+# ==========================
+def normalize_text(text: str):
+    text = text.lower()
+    text = re.sub(r'\s+', ' ', text).strip()
+    return text
+
+def tokenize(text: str):
+    return Counter(re.findall(r'\w+', text))
+
+def clamp_ocean(scores: dict):
+    for k in ["O", "C", "E", "A", "N"]:
+        scores[k] = round(min(5.0, max(1.0, scores[k])), 3)
+    return scores
+
+
+# ==========================
+# MAIN ADJUSTMENT ENGINE
+# ==========================
 def adjust_ocean_by_keywords(scores: dict, text: str):
     adjusted = scores.copy()
-    counter = Counter(re.findall(r'\w+', text.lower()))
+    text_l = normalize_text(text)
+    counter = tokenize(text_l)
 
-    # NEGATIVE_SOCIAL → menurunkan E, menaikkan N, sedikit turunkan A
-    for word in NEGATIVE_SOCIAL:
-        if word in counter:
-            f = counter[word]
+    adjusted["EXTREME_ALERT"] = False
+
+    # --------------------------
+    # NEGATIVE SOCIAL (token)
+    # --------------------------
+    for w in NEGATIVE_SOCIAL:
+        if " " not in w and w in counter:
+            f = counter[w]
             adjusted["E"] -= 0.2 * f
-            adjusted["N"] += 0.5 * f
             adjusted["A"] -= 0.1 * f
+            adjusted["N"] += 0.4 * f
 
-    # POSITIVE_SOCIAL → menaikkan E & A, sedikit menurunkan N jika sangat negatif
-    for word in POSITIVE_SOCIAL:
-        if word in counter:
-            f = counter[word]
-            adjusted["A"] += 0.4 * f   # fokus ke agreeableness
+        elif " " in w and w in text_l:
+            adjusted["E"] -= 0.2
+            adjusted["A"] -= 0.1
+            adjusted["N"] += 0.4
+
+    # --------------------------
+    # POSITIVE SOCIAL
+    # --------------------------
+    for w in POSITIVE_SOCIAL:
+        if " " not in w and w in counter:
+            f = counter[w]
             adjusted["E"] += 0.3 * f
+            adjusted["A"] += 0.4 * f
             adjusted["N"] -= 0.05 * f
 
+        elif " " in w and w in text_l:
+            adjusted["E"] += 0.3
+            adjusted["A"] += 0.4
+            adjusted["N"] -= 0.05
 
-    # EMO_POSITIVE → tingkatkan E & O
-    for word in EMO_POSITIVE:
-        if word in counter:
-            f = counter[word]
+    # --------------------------
+    # EMO POSITIVE
+    # --------------------------
+    for w in EMO_POSITIVE:
+        if " " not in w and w in counter:
+            f = counter[w]
             adjusted["E"] += 0.3 * f
             adjusted["O"] += 0.15 * f
 
-    # EMO_NEGATIVE → tingkatkan N & sedikit O
-    for word in EMO_NEGATIVE:
-        if word in counter:
-            f = counter[word]
+        elif " " in w and w in text_l:
+            adjusted["E"] += 0.3
+            adjusted["O"] += 0.15
+
+    # --------------------------
+    # EMO NEGATIVE
+    # --------------------------
+    for w in EMO_NEGATIVE:
+        if " " not in w and w in counter:
+            f = counter[w]
             adjusted["N"] += 0.35 * f
-            adjusted["O"] += 0.1 * f
+            adjusted["O"] += 0.05 * f
 
-    # INTROSPECTION → tingkatkan O
-    for word in INTROSPECTION:
-        if word in counter:
-            if not any(n in text.lower() for n in MENTAL_UNSTABLE_N):
-                f = counter[word]
-            adjusted["O"] += 0.35 * f
+        elif " " in w and w in text_l:
+            adjusted["N"] += 0.35
+            adjusted["O"] += 0.05
 
-    # ACHIEVEMENT → tingkatkan C
-    for word in ACHIEVEMENT:
-        if word in counter:
-            f = counter[word]
-            adjusted["C"] += 0.5 * f
+    # --------------------------
+    # INTROSPECTION (healthy vs unstable)
+    # --------------------------
+    unstable_hit = any(p in text_l for p in MENTAL_UNSTABLE_N)
 
-    # TRUST → tingkatkan A
-    for word in TRUST:
-        if word in counter:
-            f = counter[word]
-            adjusted["A"] += 0.5 * f
+    for w in INTROSPECTION:
+        if " " not in w and w in counter:
+            f = counter[w]
+            adjusted["O"] += (0.15 if unstable_hit else 0.35) * f
 
-    # RELATIONSHIP_AFFECTION → naikkan A, sedikit turunkan N
-    for word in RELATIONSHIP_AFFECTION:
-        if word in counter:
-            f = counter[word]
+        elif " " in w and w in text_l:
+            adjusted["O"] += 0.15 if unstable_hit else 0.35
+
+    # --------------------------
+    # ACHIEVEMENT / DISCIPLINE
+    # --------------------------
+    for w in ACHIEVEMENT:
+        if " " not in w and w in counter:
+            adjusted["C"] += 0.5 * counter[w]
+        elif " " in w and w in text_l:
+            adjusted["C"] += 0.5
+
+    for w in DISCIPLINE_C:
+        if " " not in w and w in counter:
+            adjusted["C"] += 0.6 * counter[w]
+        elif " " in w and w in text_l:
+            adjusted["C"] += 0.6
+
+    # --------------------------
+    # TRUST & RELATIONSHIP
+    # --------------------------
+    for w in TRUST:
+        if " " not in w and w in counter:
+            adjusted["A"] += 0.5 * counter[w]
+        elif " " in w and w in text_l:
+            adjusted["A"] += 0.5
+
+    for w in RELATIONSHIP_AFFECTION:
+        if " " not in w and w in counter:
+            f = counter[w]
             adjusted["A"] += 0.6 * f
             adjusted["N"] -= 0.1 * f
+        elif " " in w and w in text_l:
+            adjusted["A"] += 0.6
+            adjusted["N"] -= 0.1
 
-    for word in COLLABORATION:
-        if word in counter:
-            f = counter[word]
-            adjusted["A"] += 0.9 * f   # fokus ke agreeableness
-            adjusted["E"] += 0.7 * f
-            adjusted["N"] -= 0.05 * f
-     # EXTREME_NEGATIVE → N naik lebih tinggi, E turun sedikit
-    for phrase in EXTREME_NEGATIVE:
-        if phrase in text.lower():  # periksa frasa utuh
-            adjusted["N"] += 1.0   # tingkatkan Neuroticism signifikan
-            adjusted["E"] -= 0.2   # ekstrim → lebih introvert
-            # Bisa juga set alert
-            adjusted["EXTREME_ALERT"] = True
-    # CREATIVE DISCUSSION (A-dominant)
-    for phrase in CREATIVE_DISCUSSION_A:
-        if phrase in text.lower():
-            adjusted["A"] += 0.8
-            adjusted["O"] += 0.4
-            adjusted["E"] += 0.2
-    for word in DISCIPLINE_C:
-        if word in counter:
-            f = counter[word]
-            adjusted["C"] += 0.8 * f
-    for word in EXTRAVERSION_E:
-        if word in counter:
-            f = counter[word]
-            adjusted["E"] += 0.7 * f
-            adjusted["A"] += 0.3 * f
-            adjusted["N"] -= 0.05 * f
-    for word in E_SOCIAL_DEPENDENCY:
-        if word in counter:
-            f = counter[word]
+    # --------------------------
+    # COLLABORATION
+    # --------------------------
+    for w in COLLABORATION:
+        if " " not in w and w in counter:
+            f = counter[w]
+            adjusted["A"] += 0.7 * f
+            adjusted["E"] += 0.5 * f
+        elif " " in w and w in text_l:
+            adjusted["A"] += 0.7
+            adjusted["E"] += 0.5
+
+    # --------------------------
+    # EXTRAVERSION
+    # --------------------------
+    for w in EXTRAVERSION_E:
+        if " " not in w and w in counter:
+            f = counter[w]
             adjusted["E"] += 0.6 * f
             adjusted["A"] += 0.3 * f
-            adjusted["N"] -= 0.1 * f
-    for word in EMPATHY_HARMONY_A:
-        if word in counter:
-            f = counter[word]
-            adjusted["A"] += 0.7 * f
-            adjusted["N"] -= 0.1 * f
-    # MENTAL UNSTABLE / OVERTHINKING
-    for phrase in MENTAL_UNSTABLE_N:
-        if phrase in text.lower():
-            adjusted["N"] += 8.0
-            adjusted["E"] -= 0.2
-            adjusted["O"] -= 0.1
+        elif " " in w and w in text_l:
+            adjusted["E"] += 0.6
+            adjusted["A"] += 0.3
 
+    # --------------------------
+    # EMPATHY / HARMONY
+    # --------------------------
+    for w in EMPATHY_HARMONY_A:
+        if " " not in w and w in counter:
+            adjusted["A"] += 0.6 * counter[w]
+            adjusted["N"] -= 0.1 * counter[w]
+        elif " " in w and w in text_l:
+            adjusted["A"] += 0.6
+            adjusted["N"] -= 0.1
 
-    # Clamp ke skala 1–5 secara lebih smooth
-    for k in adjusted:
-        adjusted[k] = round(min(5.0, max(1.0, adjusted[k])), 3)
+    # --------------------------
+    # MENTAL UNSTABLE (CAPPED)
+    # --------------------------
+    mental_hits = sum(1 for p in MENTAL_UNSTABLE_N if p in text_l)
+    if mental_hits > 0:
+        adjusted["N"] += min(1.5, 0.6 * mental_hits)
+        adjusted["E"] -= 0.2
 
-    return max(adjusted, key=adjusted.get), adjusted
+    # --------------------------
+    # EXTREME NEGATIVE
+    # --------------------------
+    for p in EXTREME_NEGATIVE:
+        if p in text_l:
+            adjusted["N"] += 1.0
+            adjusted["E"] -= 0.3
+            adjusted["EXTREME_ALERT"] = True
+            break
+
+    # --------------------------
+    # FINALIZE
+    # --------------------------
+    adjusted = clamp_ocean(adjusted)
+    dominant = max({k: v for k, v in adjusted.items() if k in ["O","C","E","A","N"]}, key=adjusted.get)
+
+    return dominant, adjusted
+
 
 # ==========================
 # KEYWORD → OCEAN MAPPING
