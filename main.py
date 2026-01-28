@@ -567,196 +567,157 @@ EXTREME_NEGATIVE += [f"me{w}" for w in ["mati","bunuh","menyerah"]]
 # ==========================
 from collections import Counter
 import re
-import math
 
-# ==========================
-# HELPER
-# ==========================
-def normalize_text(text: str):
-    text = text.lower()
-    text = re.sub(r'\s+', ' ', text).strip()
-    return text
+OCEAN_KEYS = ["O", "C", "E", "A", "N"]
 
-def tokenize(text: str):
-    return Counter(re.findall(r'\w+', text))
-
-def clamp_ocean(scores: dict):
-    for k in ["O", "C", "E", "A", "N"]:
-        scores[k] = round(min(5.0, max(1.0, scores[k])), 3)
-    return scores
-
-
-# ==========================
-# MAIN ADJUSTMENT ENGINE
-# ==========================
 def adjust_ocean_by_keywords(scores: dict, text: str):
     adjusted = scores.copy()
-    text_l = normalize_text(text)
-    counter = tokenize(text_l)
+    text_lower = text.lower()
+    tokens = re.findall(r'\w+', text_lower)
+    counter = Counter(tokens)
 
-    adjusted["EXTREME_ALERT"] = False
-
-    # --------------------------
-    # NEGATIVE SOCIAL (token)
-    # --------------------------
-    for w in NEGATIVE_SOCIAL:
-        if " " not in w and w in counter:
-            f = counter[w]
+    # =============================
+    # 1. NEGATIVE SOCIAL
+    # =============================
+    for word in NEGATIVE_SOCIAL:
+        if " " in word:
+            if word in text_lower:
+                adjusted["E"] -= 0.2
+                adjusted["N"] += 0.5
+                adjusted["A"] -= 0.1
+        else:
+            f = counter.get(word, 0)
             adjusted["E"] -= 0.2 * f
+            adjusted["N"] += 0.5 * f
             adjusted["A"] -= 0.1 * f
-            adjusted["N"] += 0.4 * f
 
-        elif " " in w and w in text_l:
-            adjusted["E"] -= 0.2
-            adjusted["A"] -= 0.1
-            adjusted["N"] += 0.4
-
-    # --------------------------
-    # POSITIVE SOCIAL
-    # --------------------------
-    for w in POSITIVE_SOCIAL:
-        if " " not in w and w in counter:
-            f = counter[w]
-            adjusted["E"] += 0.3 * f
+    # =============================
+    # 2. POSITIVE SOCIAL
+    # =============================
+    for word in POSITIVE_SOCIAL:
+        if " " in word:
+            if word in text_lower:
+                adjusted["A"] += 0.4
+                adjusted["E"] += 0.3
+                adjusted["N"] -= 0.05
+        else:
+            f = counter.get(word, 0)
             adjusted["A"] += 0.4 * f
+            adjusted["E"] += 0.3 * f
             adjusted["N"] -= 0.05 * f
 
-        elif " " in w and w in text_l:
-            adjusted["E"] += 0.3
-            adjusted["A"] += 0.4
-            adjusted["N"] -= 0.05
-
-    # --------------------------
-    # EMO POSITIVE
-    # --------------------------
-    for w in EMO_POSITIVE:
-        if " " not in w and w in counter:
-            f = counter[w]
+    # =============================
+    # 3. EMO POSITIVE
+    # =============================
+    for word in EMO_POSITIVE:
+        if " " in word:
+            if word in text_lower:
+                adjusted["E"] += 0.3
+                adjusted["O"] += 0.15
+        else:
+            f = counter.get(word, 0)
             adjusted["E"] += 0.3 * f
             adjusted["O"] += 0.15 * f
 
-        elif " " in w and w in text_l:
-            adjusted["E"] += 0.3
-            adjusted["O"] += 0.15
-
-    # --------------------------
-    # EMO NEGATIVE
-    # --------------------------
-    for w in EMO_NEGATIVE:
-        if " " not in w and w in counter:
-            f = counter[w]
+    # =============================
+    # 4. EMO NEGATIVE
+    # =============================
+    for word in EMO_NEGATIVE:
+        if " " in word:
+            if word in text_lower:
+                adjusted["N"] += 0.35
+                adjusted["O"] += 0.1
+        else:
+            f = counter.get(word, 0)
             adjusted["N"] += 0.35 * f
-            adjusted["O"] += 0.05 * f
+            adjusted["O"] += 0.1 * f
 
-        elif " " in w and w in text_l:
-            adjusted["N"] += 0.35
-            adjusted["O"] += 0.05
+    # =============================
+    # 5. INTROSPECTION (AMAN)
+    # =============================
+    mental_hit = any(p in text_lower for p in MENTAL_UNSTABLE_N)
 
-    # --------------------------
-    # INTROSPECTION (healthy vs unstable)
-    # --------------------------
-    unstable_hit = any(p in text_l for p in MENTAL_UNSTABLE_N)
+    for word in INTROSPECTION:
+        if " " in word:
+            if word in text_lower:
+                adjusted["O"] += 0.2 if mental_hit else 0.35
+        else:
+            f = counter.get(word, 0)
+            adjusted["O"] += (0.2 if mental_hit else 0.35) * f
 
-    for w in INTROSPECTION:
-        if " " not in w and w in counter:
-            f = counter[w]
-            adjusted["O"] += (0.15 if unstable_hit else 0.35) * f
+    # =============================
+    # 6. ACHIEVEMENT → C
+    # =============================
+    for word in ACHIEVEMENT:
+        if " " in word:
+            if word in text_lower:
+                adjusted["C"] += 0.5
+        else:
+            adjusted["C"] += 0.5 * counter.get(word, 0)
 
-        elif " " in w and w in text_l:
-            adjusted["O"] += 0.15 if unstable_hit else 0.35
+    # =============================
+    # 7. TRUST → A
+    # =============================
+    for word in TRUST:
+        if " " in word:
+            if word in text_lower:
+                adjusted["A"] += 0.5
+        else:
+            adjusted["A"] += 0.5 * counter.get(word, 0)
 
-    # --------------------------
-    # ACHIEVEMENT / DISCIPLINE
-    # --------------------------
-    for w in ACHIEVEMENT:
-        if " " not in w and w in counter:
-            adjusted["C"] += 0.5 * counter[w]
-        elif " " in w and w in text_l:
-            adjusted["C"] += 0.5
-
-    for w in DISCIPLINE_C:
-        if " " not in w and w in counter:
-            adjusted["C"] += 0.6 * counter[w]
-        elif " " in w and w in text_l:
-            adjusted["C"] += 0.6
-
-    # --------------------------
-    # TRUST & RELATIONSHIP
-    # --------------------------
-    for w in TRUST:
-        if " " not in w and w in counter:
-            adjusted["A"] += 0.5 * counter[w]
-        elif " " in w and w in text_l:
-            adjusted["A"] += 0.5
-
-    for w in RELATIONSHIP_AFFECTION:
-        if " " not in w and w in counter:
-            f = counter[w]
+    # =============================
+    # 8. RELATIONSHIP
+    # =============================
+    for word in RELATIONSHIP_AFFECTION:
+        if " " in word:
+            if word in text_lower:
+                adjusted["A"] += 0.6
+                adjusted["N"] -= 0.1
+        else:
+            f = counter.get(word, 0)
             adjusted["A"] += 0.6 * f
             adjusted["N"] -= 0.1 * f
-        elif " " in w and w in text_l:
-            adjusted["A"] += 0.6
-            adjusted["N"] -= 0.1
 
-    # --------------------------
-    # COLLABORATION
-    # --------------------------
-    for w in COLLABORATION:
-        if " " not in w and w in counter:
-            f = counter[w]
-            adjusted["A"] += 0.7 * f
-            adjusted["E"] += 0.5 * f
-        elif " " in w and w in text_l:
-            adjusted["A"] += 0.7
-            adjusted["E"] += 0.5
-
-    # --------------------------
-    # EXTRAVERSION
-    # --------------------------
-    for w in EXTRAVERSION_E:
-        if " " not in w and w in counter:
-            f = counter[w]
+    # =============================
+    # 9. COLLABORATION
+    # =============================
+    for word in COLLABORATION:
+        if " " in word:
+            if word in text_lower:
+                adjusted["A"] += 0.8
+                adjusted["E"] += 0.6
+                adjusted["N"] -= 0.05
+        else:
+            f = counter.get(word, 0)
+            adjusted["A"] += 0.8 * f
             adjusted["E"] += 0.6 * f
-            adjusted["A"] += 0.3 * f
-        elif " " in w and w in text_l:
-            adjusted["E"] += 0.6
-            adjusted["A"] += 0.3
+            adjusted["N"] -= 0.05 * f
 
-    # --------------------------
-    # EMPATHY / HARMONY
-    # --------------------------
-    for w in EMPATHY_HARMONY_A:
-        if " " not in w and w in counter:
-            adjusted["A"] += 0.6 * counter[w]
-            adjusted["N"] -= 0.1 * counter[w]
-        elif " " in w and w in text_l:
-            adjusted["A"] += 0.6
-            adjusted["N"] -= 0.1
-
-    # --------------------------
-    # MENTAL UNSTABLE (CAPPED)
-    # --------------------------
-    mental_hits = sum(1 for p in MENTAL_UNSTABLE_N if p in text_l)
-    if mental_hits > 0:
-        adjusted["N"] += min(1.5, 0.6 * mental_hits)
-        adjusted["E"] -= 0.2
-
-    # --------------------------
-    # EXTREME NEGATIVE
-    # --------------------------
-    for p in EXTREME_NEGATIVE:
-        if p in text_l:
-            adjusted["N"] += 1.0
+    # =============================
+    # 10. EXTREME NEGATIVE (ALERT)
+    # =============================
+    for phrase in EXTREME_NEGATIVE:
+        if phrase in text_lower:
+            adjusted["N"] += 1.5
             adjusted["E"] -= 0.3
             adjusted["EXTREME_ALERT"] = True
             break
 
-    # --------------------------
-    # FINALIZE
-    # --------------------------
-    adjusted = clamp_ocean(adjusted)
-    dominant = max({k: v for k, v in adjusted.items() if k in ["O","C","E","A","N"]}, key=adjusted.get)
+    # =============================
+    # 11. MENTAL UNSTABLE (CAP)
+    # =============================
+    mental_count = sum(1 for p in MENTAL_UNSTABLE_N if p in text_lower)
+    if mental_count > 0:
+        adjusted["N"] += min(1.5, 0.6 * mental_count)
+        adjusted["E"] -= 0.2
 
+    # =============================
+    # 12. CLAMP OCEAN ONLY
+    # =============================
+    for k in OCEAN_KEYS:
+        adjusted[k] = round(min(5.0, max(1.0, adjusted[k])), 3)
+
+    dominant = max(OCEAN_KEYS, key=lambda k: adjusted[k])
     return dominant, adjusted
 
 
@@ -843,17 +804,8 @@ def apply_emotional_keyword_adjustment(text: str, scores: dict):
 
     return adjusted
 
-def determine_dominant_trait(scores, text):
-    # Hitung E/A/N untuk konteks sosial
-    social_hits = sum(1 for w in POSITIVE_SOCIAL+COLLABORATION if w in text.lower())
-    emo_hits = sum(1 for w in EMO_POSITIVE if w in text.lower())
-
-    # Jika banyak kata kolaborasi → dominan A
-    if social_hits >= 1:
-        return "A"
-    if emo_hits >= 1:
-        return "E"
-    return max(scores, key=scores.get)
+def determine_dominant_trait(scores: dict):
+    return max(["O","C","E","A","N"], key=lambda k: scores[k])
 
 # ==========================
 # HIGHLIGHT
@@ -877,10 +829,11 @@ def highlight_keywords_in_text(text: str, evidence: dict):
 def extract_keywords(text, top_n=5):
     return [w for w,_ in Counter(re.findall(r'\w+', text.lower())).most_common(top_n)]
 
-def generate_explanation_suggestion_super(text, adjusted, evidence):
-    dominant = max(adjusted, key=adjusted.get)
-    words = extract_keywords(text)
-    snippet = ", ".join(words[:3])
+def generate_explanation_suggestion_super(text, adjusted):
+    dominant = determine_dominant_trait(adjusted)
+    words = Counter(re.findall(r'\w+', text.lower())).most_common(3)
+    snippet = ", ".join(w for w,_ in words)
+
 
     # Peringatan jika kalimat ekstrem
     if adjusted.get("EXTREME_ALERT"):
