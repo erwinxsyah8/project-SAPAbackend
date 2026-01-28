@@ -568,158 +568,120 @@ EXTREME_NEGATIVE += [f"me{w}" for w in ["mati","bunuh","menyerah"]]
 from collections import Counter
 import re
 
-OCEAN_KEYS = ["O", "C", "E", "A", "N"]
-
 def adjust_ocean_by_keywords(scores: dict, text: str):
     adjusted = scores.copy()
-    text_lower = text.lower()
-    tokens = re.findall(r'\w+', text_lower)
-    counter = Counter(tokens)
+    counter = Counter(re.findall(r'\w+', text.lower()))
 
-    # =============================
-    # 1. NEGATIVE SOCIAL
-    # =============================
+    # NEGATIVE_SOCIAL → menurunkan E, menaikkan N, sedikit turunkan A
     for word in NEGATIVE_SOCIAL:
-        if " " in word:
-            if word in text_lower:
-                adjusted["E"] -= 0.2
-                adjusted["N"] += 0.5
-                adjusted["A"] -= 0.1
-        else:
-            f = counter.get(word, 0)
+        if word in counter:
+            f = counter[word]
             adjusted["E"] -= 0.2 * f
             adjusted["N"] += 0.5 * f
             adjusted["A"] -= 0.1 * f
 
-    # =============================
-    # 2. POSITIVE SOCIAL
-    # =============================
+    # POSITIVE_SOCIAL → menaikkan E & A, sedikit menurunkan N jika sangat negatif
     for word in POSITIVE_SOCIAL:
-        if " " in word:
-            if word in text_lower:
-                adjusted["A"] += 0.4
-                adjusted["E"] += 0.3
-                adjusted["N"] -= 0.05
-        else:
-            f = counter.get(word, 0)
-            adjusted["A"] += 0.4 * f
+        if word in counter:
+            f = counter[word]
+            adjusted["A"] += 0.4 * f   # fokus ke agreeableness
             adjusted["E"] += 0.3 * f
             adjusted["N"] -= 0.05 * f
 
-    # =============================
-    # 3. EMO POSITIVE
-    # =============================
+
+    # EMO_POSITIVE → tingkatkan E & O
     for word in EMO_POSITIVE:
-        if " " in word:
-            if word in text_lower:
-                adjusted["E"] += 0.3
-                adjusted["O"] += 0.15
-        else:
-            f = counter.get(word, 0)
+        if word in counter:
+            f = counter[word]
             adjusted["E"] += 0.3 * f
             adjusted["O"] += 0.15 * f
 
-    # =============================
-    # 4. EMO NEGATIVE
-    # =============================
+    # EMO_NEGATIVE → tingkatkan N & sedikit O
     for word in EMO_NEGATIVE:
-        if " " in word:
-            if word in text_lower:
-                adjusted["N"] += 0.35
-                adjusted["O"] += 0.1
-        else:
-            f = counter.get(word, 0)
+        if word in counter:
+            f = counter[word]
             adjusted["N"] += 0.35 * f
             adjusted["O"] += 0.1 * f
 
-    # =============================
-    # 5. INTROSPECTION (AMAN)
-    # =============================
-    mental_hit = any(p in text_lower for p in MENTAL_UNSTABLE_N)
-
+    # INTROSPECTION → tingkatkan O
     for word in INTROSPECTION:
-        if " " in word:
-            if word in text_lower:
-                adjusted["O"] += 0.2 if mental_hit else 0.35
-        else:
-            f = counter.get(word, 0)
-            adjusted["O"] += (0.2 if mental_hit else 0.35) * f
+        if word in counter:
+            if not any(n in text.lower() for n in MENTAL_UNSTABLE_N):
+                f = counter[word]
+            adjusted["O"] += 0.35 * f
 
-    # =============================
-    # 6. ACHIEVEMENT → C
-    # =============================
+    # ACHIEVEMENT → tingkatkan C
     for word in ACHIEVEMENT:
-        if " " in word:
-            if word in text_lower:
-                adjusted["C"] += 0.5
-        else:
-            adjusted["C"] += 0.5 * counter.get(word, 0)
+        if word in counter:
+            f = counter[word]
+            adjusted["C"] += 0.5 * f
 
-    # =============================
-    # 7. TRUST → A
-    # =============================
+    # TRUST → tingkatkan A
     for word in TRUST:
-        if " " in word:
-            if word in text_lower:
-                adjusted["A"] += 0.5
-        else:
-            adjusted["A"] += 0.5 * counter.get(word, 0)
+        if word in counter:
+            f = counter[word]
+            adjusted["A"] += 0.5 * f
 
-    # =============================
-    # 8. RELATIONSHIP
-    # =============================
+    # RELATIONSHIP_AFFECTION → naikkan A, sedikit turunkan N
     for word in RELATIONSHIP_AFFECTION:
-        if " " in word:
-            if word in text_lower:
-                adjusted["A"] += 0.6
-                adjusted["N"] -= 0.1
-        else:
-            f = counter.get(word, 0)
+        if word in counter:
+            f = counter[word]
             adjusted["A"] += 0.6 * f
             adjusted["N"] -= 0.1 * f
 
-    # =============================
-    # 9. COLLABORATION
-    # =============================
     for word in COLLABORATION:
-        if " " in word:
-            if word in text_lower:
-                adjusted["A"] += 0.8
-                adjusted["E"] += 0.6
-                adjusted["N"] -= 0.05
-        else:
-            f = counter.get(word, 0)
-            adjusted["A"] += 0.8 * f
-            adjusted["E"] += 0.6 * f
+        if word in counter:
+            f = counter[word]
+            adjusted["A"] += 0.9 * f   # fokus ke agreeableness
+            adjusted["E"] += 0.7 * f
             adjusted["N"] -= 0.05 * f
-
-    # =============================
-    # 10. EXTREME NEGATIVE (ALERT)
-    # =============================
+     # EXTREME_NEGATIVE → N naik lebih tinggi, E turun sedikit
     for phrase in EXTREME_NEGATIVE:
-        if phrase in text_lower:
-            adjusted["N"] += 1.5
-            adjusted["E"] -= 0.3
+        if phrase in text.lower():  # periksa frasa utuh
+            adjusted["N"] += 1.0   # tingkatkan Neuroticism signifikan
+            adjusted["E"] -= 0.2   # ekstrim → lebih introvert
+            # Bisa juga set alert
             adjusted["EXTREME_ALERT"] = True
-            break
+    # CREATIVE DISCUSSION (A-dominant)
+    for phrase in CREATIVE_DISCUSSION_A:
+        if phrase in text.lower():
+            adjusted["A"] += 0.8
+            adjusted["O"] += 0.4
+            adjusted["E"] += 0.2
+    for word in DISCIPLINE_C:
+        if word in counter:
+            f = counter[word]
+            adjusted["C"] += 0.8 * f
+    for word in EXTRAVERSION_E:
+        if word in counter:
+            f = counter[word]
+            adjusted["E"] += 0.7 * f
+            adjusted["A"] += 0.3 * f
+            adjusted["N"] -= 0.05 * f
+    for word in E_SOCIAL_DEPENDENCY:
+        if word in counter:
+            f = counter[word]
+            adjusted["E"] += 0.6 * f
+            adjusted["A"] += 0.3 * f
+            adjusted["N"] -= 0.1 * f
+    for word in EMPATHY_HARMONY_A:
+        if word in counter:
+            f = counter[word]
+            adjusted["A"] += 0.7 * f
+            adjusted["N"] -= 0.1 * f
+    # MENTAL UNSTABLE / OVERTHINKING
+    for phrase in MENTAL_UNSTABLE_N:
+        if phrase in text.lower():
+            adjusted["N"] += 8.0
+            adjusted["E"] -= 0.2
+            adjusted["O"] -= 0.1
 
-    # =============================
-    # 11. MENTAL UNSTABLE (CAP)
-    # =============================
-    mental_count = sum(1 for p in MENTAL_UNSTABLE_N if p in text_lower)
-    if mental_count > 0:
-        adjusted["N"] += min(1.5, 0.6 * mental_count)
-        adjusted["E"] -= 0.2
 
-    # =============================
-    # 12. CLAMP OCEAN ONLY
-    # =============================
-    for k in OCEAN_KEYS:
+    # Clamp ke skala 1–5 secara lebih smooth
+    for k in adjusted:
         adjusted[k] = round(min(5.0, max(1.0, adjusted[k])), 3)
 
-    dominant = max(OCEAN_KEYS, key=lambda k: adjusted[k])
-    return dominant, adjusted
-
+    return max(adjusted, key=adjusted.get), adjusted
 
 # ==========================
 # KEYWORD → OCEAN MAPPING
@@ -804,8 +766,17 @@ def apply_emotional_keyword_adjustment(text: str, scores: dict):
 
     return adjusted
 
-def determine_dominant_trait(scores: dict):
-    return max(["O","C","E","A","N"], key=lambda k: scores[k])
+def determine_dominant_trait(scores, text):
+    # Hitung E/A/N untuk konteks sosial
+    social_hits = sum(1 for w in POSITIVE_SOCIAL+COLLABORATION if w in text.lower())
+    emo_hits = sum(1 for w in EMO_POSITIVE if w in text.lower())
+
+    # Jika banyak kata kolaborasi → dominan A
+    if social_hits >= 1:
+        return "A"
+    if emo_hits >= 1:
+        return "E"
+    return max(scores, key=scores.get)
 
 # ==========================
 # HIGHLIGHT
@@ -829,11 +800,10 @@ def highlight_keywords_in_text(text: str, evidence: dict):
 def extract_keywords(text, top_n=5):
     return [w for w,_ in Counter(re.findall(r'\w+', text.lower())).most_common(top_n)]
 
-def generate_explanation_suggestion_super(text, adjusted):
-    dominant = determine_dominant_trait(adjusted)
-    words = Counter(re.findall(r'\w+', text.lower())).most_common(3)
-    snippet = ", ".join(w for w,_ in words)
-
+def generate_explanation_suggestion_super(text, adjusted, evidence):
+    dominant = max(adjusted, key=adjusted.get)
+    words = extract_keywords(text)
+    snippet = ", ".join(words[:3])
 
     # Peringatan jika kalimat ekstrem
     if adjusted.get("EXTREME_ALERT"):
