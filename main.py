@@ -361,8 +361,9 @@ def adjust_ocean_by_keywords(scores: dict, text: str):
     for word in EMPATHY_HARMONY_A:
         if word in counter:
             f = counter[word]
-            adjusted["A"] += 0.7 * f
-            adjusted["N"] -= 0.1 * f
+            adjusted["A"] += 0.8 * f
+            adjusted["N"] -= 0.3 * f
+            adjusted["O"] -= 0.3 * f
 
     # MENTAL UNSTABLE / OVERTHINKING → turunkan O 0.75x
     for phrase in MENTAL_UNSTABLE_N:
@@ -398,7 +399,7 @@ KEYWORD_TRAIT_MAP = {
     "DISCIPLINE_C": {"C": 1.2, "O": -0.4},
     "EXTRAVERSION_E": {"E": 0.6, "A": -0.7, "O": -0.8},
     "E_SOCIAL_DEPENDENCY": {"E": 0.6, "A": 0.4, "N": -0.1},
-    "EMPATHY_HARMONY_A": {"A": 0.7, "N": -0.1},
+    "EMPATHY_HARMONY_A": {"A": 0.8, "N": -0.3, "O": -0.3},
     "MENTAL_UNSTABLE_N": {"N": 8.0, "E": -0.2, "O": -0.1},
 
 }
@@ -443,7 +444,7 @@ def apply_emotional_keyword_adjustment(text: str, scores: dict, o_reduce: float 
                 adjusted["A"] -= 0.35 * f
             if word in ACHIEVEMENT + DISCIPLINE_C + INTROSPECTION + TRUST + EMPATHY_HARMONY_A:
                 adjusted["E"] += 0.45 * f
-                adjusted["O"] += 0.45 * f
+                adjusted["O"] -= 0.25 * f
                 adjusted["N"] -= 0.45 * f
 
     # ==========================
