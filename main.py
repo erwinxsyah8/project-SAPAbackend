@@ -443,6 +443,7 @@ def apply_emotional_keyword_adjustment(text: str, scores: dict, o_reduce: float 
                 adjusted["E"] += 0.35 * f
                 adjusted["A"] -= 0.35 * f
             if word in ACHIEVEMENT + DISCIPLINE_C + INTROSPECTION + TRUST + EMPATHY_HARMONY_A:
+                adjusted["A"] -= 0.35 * f
                 adjusted["E"] += 0.45 * f
                 adjusted["O"] -= 0.25 
                 adjusted["N"] -= 0.45 
