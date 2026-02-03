@@ -7,7 +7,7 @@ import random
 import tweepy
 import math
 import os
-
+import base64
 import matplotlib.pyplot as plt
 import base64, hashlib
 import pandas as pd
@@ -19,6 +19,7 @@ from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
+from fastapi.responses import StreamingResponse
 from oauthlib.common import generate_token
 from requests_oauthlib import OAuth2Session
 from pydantic import BaseModel
@@ -1122,71 +1123,129 @@ def run_ocean_pipeline(text: str, username: str | None = None):
         "suggestion": suggestion,
         "ocean_chart_base64": chart
     }
+def build_excel_rows(results):
+    rows = []
 
+    for r in results:
+        scores = r["prediction_adjusted"]
+
+        rows.append({
+            "text": re.sub(r"<.*?>", "", r.get("highlighted_text", "")),
+            "O": scores["O"],
+            "C": scores["C"],
+            "E": scores["E"],
+            "A": scores["A"],
+            "N": scores["N"],
+            "kepribadian": ", ".join(r.get("personality_profile", [])),
+            "solusi": r.get("suggestion", "")
+        })
+
+    return pd.DataFrame(rows)
+def dataframe_to_excel_bytes(df_detail, profile_summary=None):
+    buffer = BytesIO()
+
+    with pd.ExcelWriter(buffer, engine="openpyxl") as writer:
+        # Sheet 1: Detail
+        df_detail.to_excel(writer, index=False, sheet_name="Detail")
+
+        # Sheet 2: Profile Summary (jika ada)
+        if profile_summary:
+            summary_rows = [
+                {"metric": "O", "value": profile_summary["average_ocean_likert"]["O"]},
+                {"metric": "C", "value": profile_summary["average_ocean_likert"]["C"]},
+                {"metric": "E", "value": profile_summary["average_ocean_likert"]["E"]},
+                {"metric": "A", "value": profile_summary["average_ocean_likert"]["A"]},
+                {"metric": "N", "value": profile_summary["average_ocean_likert"]["N"]},
+                {"metric": "Dominant Trait", "value": profile_summary["dominant_trait"]},
+                {"metric": "Conclusion", "value": profile_summary["conclusion"]},
+                {"metric": "Suggestion", "value": profile_summary["suggestion"]},
+                {"metric": "Total Text", "value": profile_summary["total_text_analyzed"]},
+            ]
+
+            df_summary = pd.DataFrame(summary_rows)
+            df_summary.to_excel(writer, index=False, sheet_name="Profile_Summary")
+
+    buffer.seek(0)
+    return buffer
+
+def excel_buffer_to_base64(buffer: BytesIO):
+    buffer.seek(0)
+    return base64.b64encode(buffer.read()).decode("utf-8")
 @app.post("/predict/excel")
 async def predict_from_excel(file: UploadFile = File(...)):
-    """
-    Upload file Excel (.xlsx) dengan kolom 'text' berisi teks.
-    Endpoint akan memproses tiap teks dan mengembalikan prediksi OCEAN.
-    """
     if not file.filename.endswith(".xlsx"):
         raise HTTPException(400, "File harus berformat .xlsx")
 
-    try:
-        # Baca Excel ke DataFrame
-        df = pd.read_excel(file.file)
+    df = pd.read_excel(file.file)
 
-        if "text" not in df.columns:
-            raise HTTPException(400, "Excel harus memiliki kolom 'text'")
+    if "text" not in df.columns:
+        raise HTTPException(400, "Excel harus memiliki kolom 'text'")
 
-        results = []
+    results = []
+    for idx, row in df.iterrows():
+        text = str(row["text"])
+        if not text.strip():
+            continue
 
-        # Loop tiap baris teks
-        for idx, row in df.iterrows():
-            text = str(row["text"])
-            if not text.strip():
-                continue
+        r = run_ocean_pipeline(text=text)
+        r["row_index"] = idx
+        results.append(r)
 
-            result = run_ocean_pipeline(text=text, username=None)
-            result["row_index"] = idx
-            results.append(result)
+    # === BUILD EXCEL ===
+    df_detail = build_excel_rows(results)
+    excel_buffer = dataframe_to_excel_bytes(df_detail)
+    excel_b64 = excel_buffer_to_base64(excel_buffer)
 
-        return {"status": "success", "results": results}
-
-    except Exception as e:
-        raise HTTPException(500, f"Error memproses file Excel: {str(e)}")
+    return {
+        "status": "success",
+        "total_rows": len(results),
+        "results": results,
+        "excel": {
+            "filename": "ocean_result.xlsx",
+            "content_base64": excel_b64
+        }
+    }
 @app.post("/predict/excel/profile")
 async def predict_from_excel_profile(file: UploadFile = File(...)):
     if not file.filename.endswith(".xlsx"):
         raise HTTPException(400, "File harus berformat .xlsx")
 
-    try:
-        df = pd.read_excel(file.file)
+    df = pd.read_excel(file.file)
 
-        if "text" not in df.columns:
-            raise HTTPException(400, "Excel harus memiliki kolom 'text'")
+    if "text" not in df.columns:
+        raise HTTPException(400, "Excel harus memiliki kolom 'text'")
 
-        results = []
+    results = []
+    for idx, row in df.iterrows():
+        text = str(row["text"])
+        if not text.strip():
+            continue
 
-        for idx, row in df.iterrows():
-            text = str(row["text"])
-            if not text.strip():
-                continue
+        r = run_ocean_pipeline(text=text)
+        r["row_index"] = idx
+        results.append(r)
 
-            result = run_ocean_pipeline(text=text, username=None)
-            result["row_index"] = idx
-            results.append(result)
+    # ===== PROFILE AGGREGATION =====
+    profile_summary = aggregate_ocean_profile(results)
 
-        profile_summary = aggregate_ocean_profile(results)
+    # ===== EXCEL =====
+    df_detail = build_excel_rows(results)
+    excel_buffer = dataframe_to_excel_bytes(
+        df_detail,
+        profile_summary=profile_summary
+    )
+    excel_b64 = excel_buffer_to_base64(excel_buffer)
 
-        return {
-            "status": "success",
-            "row_results": results,
-            "profile_summary": profile_summary
+    return {
+        "status": "success",
+        "total_text": len(results),
+        "row_results": results,
+        "profile_summary": profile_summary,
+        "excel": {
+            "filename": "ocean_profile_result.xlsx",
+            "content_base64": excel_b64
         }
-
-    except Exception as e:
-        raise HTTPException(500, f"Error memproses file Excel: {str(e)}")
+    }
 
 @app.post("/predict")
 def predict(data: TextInput):
