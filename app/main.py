@@ -1123,6 +1123,10 @@ def run_ocean_pipeline(text: str, username: str | None = None):
         "suggestion": suggestion,
         "ocean_chart_base64": chart
     }
+def likert_to_percent(value, scale=5):
+    if value is None:
+        return 0
+    return round((float(value) / scale) * 100, 2)
 def build_excel_rows(results):
     rows = []
 
@@ -1131,16 +1135,17 @@ def build_excel_rows(results):
 
         rows.append({
             "text": re.sub(r"<.*?>", "", r.get("highlighted_text", "")),
-            "O": scores["O"],
-            "C": scores["C"],
-            "E": scores["E"],
-            "A": scores["A"],
-            "N": scores["N"],
+            "O (%)": likert_to_percent(scores["O"]),
+            "C (%)": likert_to_percent(scores["C"]),
+            "E (%)": likert_to_percent(scores["E"]),
+            "A (%)": likert_to_percent(scores["A"]),
+            "N (%)": likert_to_percent(scores["N"]),
             "kepribadian": ", ".join(r.get("personality_profile", [])),
             "solusi": r.get("suggestion", "")
         })
 
     return pd.DataFrame(rows)
+
 def dataframe_to_excel_bytes(df_detail, profile_summary=None):
     buffer = BytesIO()
 
@@ -1156,16 +1161,17 @@ def dataframe_to_excel_bytes(df_detail, profile_summary=None):
 
             summary_rows = [
                 pad(["SUMMARY"]),
-                pad(["Average O", profile_summary["average_ocean_likert"]["O"]]),
-                pad(["Average C", profile_summary["average_ocean_likert"]["C"]]),
-                pad(["Average E", profile_summary["average_ocean_likert"]["E"]]),
-                pad(["Average A", profile_summary["average_ocean_likert"]["A"]]),
-                pad(["Average N", profile_summary["average_ocean_likert"]["N"]]),
+                pad(["Average O (%)", likert_to_percent(profile_summary["average_ocean_likert"]["O"])]),
+                pad(["Average C (%)", likert_to_percent(profile_summary["average_ocean_likert"]["C"])]),
+                pad(["Average E (%)", likert_to_percent(profile_summary["average_ocean_likert"]["E"])]),
+                pad(["Average A (%)", likert_to_percent(profile_summary["average_ocean_likert"]["A"])]),
+                pad(["Average N (%)", likert_to_percent(profile_summary["average_ocean_likert"]["N"])]),
                 pad(["Dominant Trait", profile_summary["dominant_trait"]]),
                 pad(["Conclusion", profile_summary["conclusion"]]),
                 pad(["Suggestion", profile_summary["suggestion"]]),
                 pad(["Total Text", profile_summary["total_text_analyzed"]]),
             ]
+
 
             df_summary = pd.DataFrame(summary_rows, columns=df_detail.columns)
             df_summary.to_excel(
