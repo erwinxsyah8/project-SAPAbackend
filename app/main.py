@@ -1145,28 +1145,41 @@ def dataframe_to_excel_bytes(df_detail, profile_summary=None):
     buffer = BytesIO()
 
     with pd.ExcelWriter(buffer, engine="openpyxl") as writer:
-        # Sheet 1: Detail
         df_detail.to_excel(writer, index=False, sheet_name="Detail")
 
-        # Sheet 2: Profile Summary (jika ada)
         if profile_summary:
+            start_row = len(df_detail) + 2  # jarak 2 baris
+
             summary_rows = [
-                {"metric": "O", "value": profile_summary["average_ocean_likert"]["O"]},
-                {"metric": "C", "value": profile_summary["average_ocean_likert"]["C"]},
-                {"metric": "E", "value": profile_summary["average_ocean_likert"]["E"]},
-                {"metric": "A", "value": profile_summary["average_ocean_likert"]["A"]},
-                {"metric": "N", "value": profile_summary["average_ocean_likert"]["N"]},
-                {"metric": "Dominant Trait", "value": profile_summary["dominant_trait"]},
-                {"metric": "Conclusion", "value": profile_summary["conclusion"]},
-                {"metric": "Suggestion", "value": profile_summary["suggestion"]},
-                {"metric": "Total Text", "value": profile_summary["total_text_analyzed"]},
+                ["", "", "", "", ""],  # spacer
+                ["SUMMARY", "", "", "", ""],
+                ["Average O", profile_summary["average_ocean_likert"]["O"], "", "", ""],
+                ["Average C", profile_summary["average_ocean_likert"]["C"], "", "", ""],
+                ["Average E", profile_summary["average_ocean_likert"]["E"], "", "", ""],
+                ["Average A", profile_summary["average_ocean_likert"]["A"], "", "", ""],
+                ["Average N", profile_summary["average_ocean_likert"]["N"], "", "", ""],
+                ["Dominant Trait", profile_summary["dominant_trait"], "", "", ""],
+                ["Conclusion", profile_summary["conclusion"], "", "", ""],
+                ["Suggestion", profile_summary["suggestion"], "", "", ""],
+                ["Total Text", profile_summary["total_text_analyzed"], "", "", ""],
             ]
 
-            df_summary = pd.DataFrame(summary_rows)
-            df_summary.to_excel(writer, index=False, sheet_name="Profile_Summary")
+            df_summary = pd.DataFrame(
+                summary_rows,
+                columns=df_detail.columns
+            )
+
+            df_summary.to_excel(
+                writer,
+                index=False,
+                header=False,
+                sheet_name="Detail",
+                startrow=start_row
+            )
 
     buffer.seek(0)
     return buffer
+
 
 def excel_buffer_to_base64(buffer: BytesIO):
     buffer.seek(0)
