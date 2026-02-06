@@ -253,224 +253,201 @@ EXTRAVERSION_E = TRAIT_KEYWORDS.get("EXTRAVERSION_E", [])
 E_SOCIAL_DEPENDENCY = TRAIT_KEYWORDS.get("E_SOCIAL_DEPENDENCY", [])
 EMPATHY_HARMONY_A = TRAIT_KEYWORDS.get("EMPATHY_HARMONY_A", [])
 MENTAL_UNSTABLE_N = TRAIT_KEYWORDS.get("MENTAL_UNSTABLE_N", [])
-
 # ==========================
-# OCEAN ADJUSTMENT REFINED
+# OCEAN ADJUSTMENT (DATA DRIVEN)
 # ==========================
 from collections import Counter
 import re
+
+
 def adjust_ocean_by_keywords(scores: dict, text: str):
+
     adjusted = scores.copy()
-    counter = Counter(re.findall(r'\w+', text.lower()))
 
-    # NEGATIVE_SOCIAL → menurunkan E, menaikkan N, sedikit turunkan A
-    for word in NEGATIVE_SOCIAL:
-        if word in counter:
-            f = counter[word]
-            adjusted["E"] -= 0.2 * f
-            adjusted["N"] += 0.5 * f
-            adjusted["A"] -= 0.1 * f
+    text_lower = text.lower()
+    tokens = re.findall(r'\w+', text_lower)
+    counter = Counter(tokens)
 
-    # POSITIVE_SOCIAL → menaikkan E & A, sedikit menurunkan N jika sangat negatif
-    for word in POSITIVE_SOCIAL:
-        if word in counter:
-            f = counter[word]
-            adjusted["A"] += 0.4 * f
-            adjusted["E"] += 0.3 * f
-            adjusted["N"] -= 0.05 * f
+    # Extreme score
+    adjusted["EXTREME_ALERT"] = 0
 
-    # EMO_POSITIVE → tingkatkan E & O (turunkan O 0.85x)
-    for word in EMO_POSITIVE:
-        if word in counter:
-            f = counter[word]
-            adjusted["E"] += 0.3 * f
-            adjusted["O"] += 0.15 * f * 0.85
 
-    # EMO_NEGATIVE → tingkatkan N & sedikit O (turunkan O 0.85x)
-    for word in EMO_NEGATIVE:
-        if word in counter:
-            f = counter[word]
-            adjusted["N"] += 0.35 * f
-            adjusted["O"] += 0.1 * f * 0.85
+    # ==========================
+    # 1. WORD BASED
+    # ==========================
+    for trait, keywords in TRAIT_KEYWORDS.items():
 
-    # INTROSPECTION → tingkatkan O (turunkan O 0.80x)
-    for word in INTROSPECTION:
-        if word in counter:
-            f = counter[word]
-            if not any(n in text.lower() for n in MENTAL_UNSTABLE_N):
-                adjusted["O"] += 0.35 * f * 0.8
+        if trait not in KEYWORD_TRAIT_MAP:
+            continue
 
-    # ACHIEVEMENT → tingkatkan C
-    for word in ACHIEVEMENT:
-        if word in counter:
-            f = counter[word]
-            adjusted["C"] += 0.5 * f
+        weights = KEYWORD_TRAIT_MAP[trait]
 
-    # TRUST → tingkatkan A
-    for word in TRUST:
-        if word in counter:
-            f = counter[word]
-            adjusted["A"] += 0.5 * f
+        for word in keywords:
 
-    # RELATIONSHIP_AFFECTION → naikkan A, sedikit turunkan N
-    for word in RELATIONSHIP_AFFECTION:
-        if word in counter:
-            f = counter[word]
-            adjusted["A"] += 0.6 * f
-            adjusted["N"] -= 0.1 * f
+            if word in counter:
 
-    for word in COLLABORATION:
-        if word in counter:
-            f = counter[word]
-            adjusted["A"] += 0.9 * f
-            adjusted["E"] += 0.7 * f
-            adjusted["N"] -= 0.05 * f
+                freq = counter[word]
 
-    # EXTREME_NEGATIVE → N naik lebih tinggi, E turun sedikit
-    for phrase in EXTREME_NEGATIVE:
-        if phrase in text.lower():
-            adjusted["N"] += 1.0
-            adjusted["E"] -= 0.2
-            adjusted["EXTREME_ALERT"] = True
+                # extreme detect
+                if trait == "EXTREME_NEGATIVE":
+                    adjusted["EXTREME_ALERT"] += freq * 2
 
-    # CREATIVE DISCUSSION (A-dominant) → turunkan O 0.85x
-    for phrase in CREATIVE_DISCUSSION_A:
-        if phrase in text.lower():
-            adjusted["A"] -= 0.3
-            adjusted["O"] += 0.4 * 0.85
-            adjusted["E"] += 0.2
+                for ocean_dim, w in weights.items():
+                    adjusted[ocean_dim] += w * freq
 
-    for word in DISCIPLINE_C:
-        if word in counter:
-            f = counter[word]
-            adjusted["C"] += 1.2 * f
-            adjusted["O"] -= 0.4
 
-    for word in EXTRAVERSION_E:
-        if word in counter:
-            f = counter[word]
-            adjusted["E"] += 0.7 * f
-            adjusted["A"] += 0.3 * f
-            adjusted["N"] -= 0.05 * f
+    # ==========================
+    # 2. PHRASE BASED
+    # ==========================
+    for trait, keywords in TRAIT_KEYWORDS.items():
 
-    for phrase in E_SOCIAL_DEPENDENCY + ACHIEVEMENT + EXTRAVERSION_E:
-        if phrase.lower() in text.lower():
-            adjusted["E"] += 0.6
-            adjusted["A"] -= 0.7
-            adjusted["O"] -= 0.8
+        if trait not in KEYWORD_TRAIT_MAP:
+            continue
 
-    for word in EMPATHY_HARMONY_A:
-        if word in counter:
-            f = counter[word]
-            adjusted["A"] += 0.8 * f
-            adjusted["N"] -= 0.3 
-            adjusted["O"] -= 0.3 
+        weights = KEYWORD_TRAIT_MAP[trait]
 
-    # MENTAL UNSTABLE / OVERTHINKING → turunkan O 0.75x
-    for phrase in MENTAL_UNSTABLE_N:
-        if phrase in text.lower():
-            adjusted["N"] += 8.0
-            adjusted["E"] -= 0.2
-            adjusted["O"] += -0.1 * 0.75
+        for phrase in keywords:
 
-    # Clamp ke skala 1–5
-    for k in adjusted:
-        adjusted[k] = round(min(5.0, max(1.0, adjusted[k])), 3)
+            if " " in phrase and phrase in text_lower:
 
-    return max(adjusted, key=adjusted.get), adjusted
+                if trait == "EXTREME_NEGATIVE":
+                    adjusted["EXTREME_ALERT"] += 3
+
+                for ocean_dim, w in weights.items():
+                    adjusted[ocean_dim] += w * 1.5
+
+
+    # ==========================
+    # 3. NORMALIZATION
+    # ==========================
+    for k in ["O", "C", "E", "A", "N"]:
+        adjusted[k] = max(1.0, min(5.0, adjusted[k]))
+
+
+    # only OCEAN for dominant
+    ocean_only = {k:v for k,v in adjusted.items() if k in ["O","C","E","A","N"]}
+
+    dominant = max(ocean_only, key=ocean_only.get)
+
+    return dominant, adjusted
 
 # ==========================
 # KEYWORD → OCEAN MAPPING
 # ==========================
 KEYWORD_TRAIT_MAP = {
-    "NEGATIVE_SOCIAL": {"E": -0.2, "N": 0.5, "A": -0.1},
-    "POSITIVE_SOCIAL": {"A": 0.3, "E": 0.6, "N": -0.05},
-    "EMO_POSITIVE": {"E": 0.3, "O": 0.15},
-    "EMO_NEGATIVE": {"N": 0.35, "O": 0.1},
-    "INTROSPECTION": {"O": 0.35},
-    "ACHIEVEMENT": {"C": 0.5},
-    "CREATIVE_DISCUSSION_A": {"A": 0.8, "E": 0.4, "C": 0.2, "N": -0.05},
-    "TRUST": {"A": 0.5},
-    "RELATIONSHIP_AFFECTION": {"A": 0.6, "N": -0.1},
-    "COLLABORATION": {"A": 0.8, "E": 0.5, "C": 0.2, "N": -0.05},
-    "ANGER_EMO": {"N": 0.5},
-    "SAD_EMO": {"N": 0.3, "O": 0.05},
-    "ANXIETY_EMO": {"N": 0.35, "E": -0.1},
-    "EXTREME_NEGATIVE": {"N": 1.0, "E": -0.2},
-    "DISCIPLINE_C": {"C": 1.2, "O": -0.4},
-    "EXTRAVERSION_E": {"E": 0.6, "A": -0.7, "O": -0.8},
-    "E_SOCIAL_DEPENDENCY": {"E": 0.6, "A": 0.4, "N": -0.1},
-    "EMPATHY_HARMONY_A": {"A": 0.8, "N": -0.3, "O": -0.3},
-    "MENTAL_UNSTABLE_N": {"N": 8.0, "E": -0.2, "O": -0.1},
+
+# ===== EMOSI NEGATIF =====
+"ANGER_EMO": {"N": 0.5, "A": -0.2},
+"SAD_EMO": {"N": 0.4, "O": 0.1},
+"ANXIETY_EMO": {"N": 0.6, "E": -0.2},
+"MENTAL_UNSTABLE_N": {"N": 1.0},
+
+"NEGATIVE_SOCIAL": {"N": 0.4, "A": -0.3, "E": -0.2},
+
+# ===== SOSIAL =====
+"POSITIVE_SOCIAL": {"E": 0.4, "A": 0.4, "N": -0.2},
+"EXTRAVERSION_E": {"E": 0.6},
+"E_SOCIAL_DEPENDENCY": {"E": 0.4, "A": 0.2},
+
+"COLLABORATION": {"A": 0.6, "E": 0.3, "C": 0.2},
+
+# ===== RELASIONAL =====
+"RELATIONSHIP_AFFECTION": {"A": 0.7, "E": 0.2},
+"EMPATHY_HARMONY_A": {"A": 0.8, "N": -0.3},
+
+"TRUST": {"A": 0.5},
+
+# ===== KOGNITIF =====
+"CREATIVE_DISCUSSION_A": {"O": 0.6, "E": 0.2},
+"INTROSPECTION": {"O": 0.5, "N": 0.1},
+
+# ===== PRODUKTIVITAS =====
+"DISCIPLINE_C": {"C": 0.9, "N": -0.2},
+"ACHIEVEMENT": {"C": 0.6, "E": 0.2},
+
+# ===== EMOSI POSITIF =====
+"EMO_POSITIVE": {"A": 0.3, "E": 0.3, "N": -0.2},
+"MENTAL_UNSTABLE_N": {"N": 1.0},
+"EXTREME_NEGATIVE": {
+    "N": 2.5,
+    "E": -0.8,
+    "A": -0.6,
+    "C": -0.6
+},
+
 
 }
+# ==========================
+# EMOTIONAL ADJUSTMENT (FINE TUNING)
+# ==========================
+def apply_emotional_keyword_adjustment(text: str, scores: dict, o_reduce: float = 0.2):
 
-# ==========================
-# EMOTIONAL KEYWORD ADJUSTMENT REFINED
-# ==========================
-def apply_emotional_keyword_adjustment(text: str, scores: dict, o_reduce: float = 0.5):
-    """
-    Adjust OCEAN scores based on emotional keywords.
-    o_reduce: angka positif, O akan dikurangi o_reduce poin dari nilai sebelumnya
-    """
     adjusted = scores.copy()
+
     text_lower = text.lower()
     tokens = re.findall(r'\w+', text_lower)
     counter = Counter(tokens)
 
-    # ==========================
-    # KATA EMOSI NEGATIF → Naikkan N
-    # ==========================
-    for word in ANGER_EMO + SAD_EMO + ANXIETY_EMO + EMO_NEGATIVE + NEGATIVE_SOCIAL + MENTAL_UNSTABLE_N:
-        if word in tokens:
-            f = counter[word]
-            adjusted["N"] += 0.3 * f
-            if word in ANXIETY_EMO:
-                adjusted["E"] -= 0.1 * f
-            if word in SAD_EMO:
-                adjusted["O"] += 0.05 * f
 
     # ==========================
-    # KATA EMOSI POSITIF → Naikkan A/E/O & turunkan N sedikit
+    # 1. EMOTIONAL BALANCE SCORE
     # ==========================
-    for word in EMO_POSITIVE + POSITIVE_SOCIAL + COLLABORATION + ACHIEVEMENT + TRUST + RELATIONSHIP_AFFECTION + EXTRAVERSION_E + E_SOCIAL_DEPENDENCY + EMPATHY_HARMONY_A + CREATIVE_DISCUSSION_A + DISCIPLINE_C + INTROSPECTION:
-        if word in tokens:
-            f = counter[word]
-            if word in EMO_POSITIVE + POSITIVE_SOCIAL + COLLABORATION:
-                adjusted["A"] += 0.35 * f
-                adjusted["N"] -= 0.1 * f
-            if word in EXTRAVERSION_E + E_SOCIAL_DEPENDENCY + CREATIVE_DISCUSSION_A:
-                adjusted["O"] += 0.55 * f
-                adjusted["E"] += 0.35 * f
-                adjusted["A"] -= 0.35 * f
-            if word in ACHIEVEMENT + DISCIPLINE_C + INTROSPECTION + TRUST + EMPATHY_HARMONY_A:
-                adjusted["A"] -= 0.35 * f
-                adjusted["E"] += 0.45 * f
-                adjusted["O"] -= 0.25 
-                adjusted["N"] -= 0.45 
+    neg_score = 0
+    pos_score = 0
+
+
+    for word in tokens:
+
+        if word in ANGER_EMO or word in SAD_EMO or word in ANXIETY_EMO:
+            neg_score += counter[word]
+
+        if word in EMO_POSITIVE or word in POSITIVE_SOCIAL or word in TRUST:
+            pos_score += counter[word]
+
 
     # ==========================
-    # Kata spesifik override ringan → turunkan N
+    # 2. ADJUST BASED ON BALANCE
     # ==========================
-    light_positive_words = ["suka", "senang", "belajar", "bahagia", "ceria", "menyenangkan"]
-    for word in light_positive_words:
-        if word in tokens:
-            adjusted["N"] = max(1.0, adjusted["N"] - 0.5)
+    if neg_score > pos_score:
+
+        diff = min(2.0, (neg_score - pos_score) * 0.15)
+
+        adjusted["N"] += diff
+        adjusted["E"] -= diff * 0.4
+
+
+    elif pos_score > neg_score:
+
+        diff = min(2.0, (pos_score - neg_score) * 0.15)
+
+        adjusted["A"] += diff
+        adjusted["E"] += diff * 0.3
+        adjusted["N"] -= diff * 0.3
+
 
     # ==========================
-    # TURUNKAN Openness dengan jumlah tetap
+    # 3. O REDUCTION (CONTEXT AWARE)
     # ==========================
-    adjusted["O"] = max(1.0, round(adjusted["O"] - o_reduce, 3))
+    creative_hits = 0
+
+    for w in EMO_POSITIVE + CREATIVE_DISCUSSION_A + INTROSPECTION:
+        if w in counter:
+            creative_hits += counter[w]
+
+
+    # Turunkan O hanya kalau TIDAK kreatif
+    if creative_hits == 0:
+        adjusted["O"] -= o_reduce
+
 
     # ==========================
-    # Clamp trait lain ke skala 1–5
+    # 4. NORMALIZE
     # ==========================
-    for k in ["C", "E", "A", "N"]:
+    for k in ["O", "C", "E", "A", "N"]:
         adjusted[k] = round(min(5.0, max(1.0, adjusted[k])), 3)
 
+
     return adjusted
-
-
 # ==========================
 # DOMINANT TRAIT SEDERHANA
 # ==========================
@@ -564,56 +541,141 @@ def generate_explanation_suggestion_super(text, adjusted, evidence):
 # DOMINANT CONTEXTUAL YANG DISERDERHANAKAN
 # ==========================
 def determine_dominant_contextual(adjusted, evidence):
-    """
-    Pilih trait dominan berdasarkan skor tertinggi, tapi override jika ada bukti sosial/emosi positif
-    """
-    # Hitung jumlah bukti sosial / emosional
-    social_hits = len(evidence.get("POSITIVE_SOCIAL", [])) + len(evidence.get("COLLABORATION", []))
-    emo_hits = len(evidence.get("EMO_POSITIVE", []))
 
-    if social_hits >= 2:
-        return "A"
-    if emo_hits >= 2:
-        return "E"
+    scores = adjusted.copy()
 
-    # Default: trait tertinggi
-    sorted_traits = sorted(adjusted.items(), key=lambda x: x[1], reverse=True)
-    return sorted_traits[0][0]  # trait dengan skor tertinggi
+    scores["E"] += len(evidence.get("POSITIVE_SOCIAL", [])) * 0.3
+    scores["A"] += len(evidence.get("EMPATHY_HARMONY_A", [])) * 0.4
+    scores["C"] += len(evidence.get("DISCIPLINE_C", [])) * 0.4
+    scores["O"] += len(evidence.get("CREATIVE_DISCUSSION_A", [])) * 0.4
+    scores["N"] += len(evidence.get("ANXIETY_EMO", [])) * 0.5
+
+    return max(scores, key=scores.get)
+def normalize_scores(scores, min_val=1.0, max_val=5.0):
+
+    for k in scores:
+        scores[k] = max(min(scores[k], max_val), min_val)
+
+    return scores
 PERSONA_RULES = [
-    # ===== EMOSI NEGATIF =====
-    ("Cemas & Pikiran Tidak Tenang", lambda s: s["N"] >= 3.6, "mudah gugup, sulit tenang, sering pikiran negatif"),
-    ("Overthinking Emosional", lambda s: s["N"] >= 3.5 and s["O"] <= 3.2, "pikiran sulit dikendalikan, sering cemas"),
-    ("Rentan Stres", lambda s: s["N"] >= 3.4 and s["C"] <= 3.0, "mudah tertekan, butuh manajemen stres"),
-    ("Tempramental", lambda s: s["N"] >= 4.0, "cepat marah, impulsif, reaktif"),
-    ("Cemas & Overthinking", lambda s: s["N"] >= 3.5 and s["E"] <= 3.0, "mudah khawatir dan gelisah"),
-    ("Melankolis", lambda s: s["N"] >= 3.2 and s["O"] >= 3.0 and s["E"] <= 3.2, "sering merenung, introspektif"),
+    # ==========================
+    # ⚠️ EXTREME / HIGH RISK
+    # ==========================
+    ("Krisis Emosional Tinggi",
+     lambda s: s.get("EXTREME_ALERT", 0) >= 3 or s["N"] >= 4.7,
+     "menunjukkan tanda tekanan psikologis berat, putus asa, atau risiko menyakiti diri"),
 
-    # ===== EMOSI POSITIF =====
-    ("Empatik & Penjaga Harmoni", lambda s: s["A"] >= 3.7, "peduli, mudah memahami orang lain"),
-    ("Pendamai Alami", lambda s: s["A"] >= 3.6 and s["N"] <= 3.2, "menghindari konflik, menciptakan damai"),
-    ("Kolaborator Hangat", lambda s: s["A"] >= 3.5 and s["E"] >= 3.0, "mudah bekerja sama dan suportif"),
-    ("Sosial Aktif", lambda s: s["E"] >= 3.6, "energik dan aktif berinteraksi"),
-    ("Penggerak Diskusi", lambda s: s["E"] >= 3.5 and s["O"] >= 3.0, "suka berdiskusi dan memancing ide"),
-    ("Ekstrovert Sosial", lambda s: s["E"] >= 3.8 and s["N"] <= 3.0, "percaya diri, mudah bergaul"),
-    ("Romantis", lambda s: s["A"] >= 3.4 and s["A"] >= s["O"] + 0.2, "hangat dan berorientasi hubungan"),
-    ("Ramah Sosial", lambda s: s["E"] >= 3.5 and s["A"] >= 3.2, "ceria, mudah bergaul"),
-    ("Empatik", lambda s: s["A"] >= 3.5 and s["N"] <= 3.2, "peduli dan suportif"),
-    ("Visioner Kreatif", lambda s: s["O"] >= 3.7 and s["O"] >= s["A"] + 0.2, "imajinatif, terbuka terhadap ide baru"),
-    ("Inovator", lambda s: s["O"] >= 3.5 and s["C"] >= 3.0 and s["E"] >= 3.0, "kreatif dan berpikir out-of-the-box"),
+    ("Depresi Mendalam",
+     lambda s: s.get("EXTREME_ALERT", 0) >= 2 and s["E"] <= 2.5 and s["N"] >= 4.2,
+     "menarik diri, kehilangan motivasi, dan mengalami kesedihan intens"),
 
-    # ===== PENCAPAIAN & DISCIPLIN =====
-    ("Perfeksionis", lambda s: s["C"] >= 3.6 and s["C"] >= s["N"] + 0.2, "terstruktur, disiplin, berorientasi pencapaian"),
-    ("Ambisius", lambda s: s["C"] >= 3.5 and s["O"] >= 3.5, "proaktif dan berinisiatif"),
-    ("Gigih & Persisten", lambda s: s["C"] >= 3.4 and s["N"] <= 3.2, "konsisten dan berdedikasi"),
-    ("Pragmatis", lambda s: s["C"] >= 3.2 and s["E"] >= 3.2, "praktis dan fokus pada hasil"),
+    ("Burnout Mental Berat",
+     lambda s: s.get("EXTREME_ALERT", 0) >= 2 and s["C"] <= 2.8 and s["N"] >= 4.0,
+     "kelelahan emosional ekstrem, kehilangan arah, dan kehabisan energi"),
+    # ==========================
+    # EMOSI NEGATIF
+    # ==========================
+    # CEMAS → REFLEKTIF, BANYAK PIKIR
+    
+    ("Cemas & Overthinking",
+    lambda s: s["N"] >= 3.6 and s["O"] >= 3.4 and s["C"] >= 3.0,
+    "mudah khawatir, banyak berpikir, reflektif terhadap masalah"),
 
-    # ===== KOLABORATOR =====
-    ("Kolaborator", lambda s: s["A"] >= 3.5 and s["E"] >= 3.2 and s["C"] >= 3.0, "mampu bekerja sama dan membangun harmoni"),
-    ("Mediator", lambda s: s["A"] >= 3.3 and s["N"] <= 3.2 and s["E"] >= 3.0, "tenang dan diplomatis"),
-    ("Pemimpin Visioner", lambda s: s["O"] >= 3.6 and s["C"] >= 3.5 and s["E"] >= 3.2, "memimpin tim dan strategis"),
+    # TEMPRAMENTAL → REAKTIF, KURANG KONTROL
+    ("Tempramental",
+    lambda s: s["N"] >= 4.0 and s["A"] <= 2.9 and s["C"] <= 3.0,
+    "emosional, mudah tersulut, impulsif saat tertekan"),
 
-    # ===== KEPRIBADIAN SEIMBANG =====
-    ("Seimbang", lambda s: all(2.8 <= s[k] <= 3.5 for k in ["O","C","E","A","N"]), "adaptif, fleksibel, tidak ekstrem"),
+
+    ("Melankolis Reflektif",
+     lambda s: s["N"] >= 3.3 and s["O"] >= 3.3 and s["E"] <= 3.0,
+     "sering merenung, introspektif, sensitif terhadap perasaan"),
+
+
+    # ==========================
+    # STABILITAS EMOSI
+    # ==========================
+    ("Stabil Emosional",
+     lambda s: s["N"] <= 2.5,
+     "tenang, terkendali, mampu mengelola tekanan dengan baik"),
+
+    ("Tangguh Mental",
+     lambda s: s["C"] >= 3.5 and s["N"] <= 3.0,
+     "kuat secara mental, tidak mudah menyerah, fokus solusi"),
+
+
+    # ==========================
+    # SOSIAL & EKSTROVERSI
+    # ==========================
+    ("Ekstrovert Sosial",
+     lambda s: s["E"] >= 3.8 and s["A"] >= 3.2,
+     "percaya diri, aktif berinteraksi, mudah bergaul"),
+
+    ("Sosial Ekspresif",
+     lambda s: s["E"] >= 3.5 and s["O"] >= 3.2,
+     "komunikatif, ekspresif, suka berbagi ide"),
+
+    ("Introvert Mandiri",
+     lambda s: s["E"] <= 2.8 and s["C"] >= 3.2,
+     "mandiri, fokus, nyaman bekerja sendiri"),
+
+
+    # ==========================
+    # RELASIONAL & CINTA
+    # ==========================
+    ("Romantis Afektif",
+     lambda s: s["A"] >= 3.6 and s["A"] >= s["O"] + 0.2,
+     "hangat, penuh perhatian, berorientasi pada hubungan"),
+
+    ("Empatik Caregiver",
+     lambda s: s["A"] >= 3.7 and s["N"] <= 3.2,
+     "peduli, protektif, senang membantu orang lain"),
+
+    ("Relasional Selektif",
+     lambda s: s["A"] >= 3.3 and s["E"] <= 3.0,
+     "ramah namun berhati-hati dalam memilih relasi"),
+    # ==========================
+    # KREATIVITAS & VISI
+    # ==========================
+    ("Visioner Kreatif",
+     lambda s: s["O"] >= 3.7 and s["O"] >= s["A"] + 0.2,
+     "imajinatif, visioner, berpikir jauh ke depan"),
+
+    ("Pemikir Inovatif",
+     lambda s: s["O"] >= 3.5 and s["E"] >= 3.2,
+     "aktif menciptakan ide baru dan solusi kreatif"),
+
+    ("Reflektif Analitis",
+     lambda s: s["O"] >= 3.3 and s["C"] >= 3.3,
+     "mendalam, sistematis, kritis dalam berpikir"),
+
+
+    # ==========================
+    # DISIPLIN & KERJA
+    # ==========================
+    ("Perfeksionis Produktif",
+     lambda s: s["C"] >= 3.8 and s["C"] >= s["N"] + 0.2,
+     "teliti, terstruktur, menuntut standar tinggi"),
+
+    ("Ambisius Visioner",
+     lambda s: s["C"] >= 3.5 and s["O"] >= 3.5,
+     "berorientasi prestasi, berpikir strategis"),
+
+    ("Pragmatis Efisien",
+     lambda s: s["C"] >= 3.3 and s["E"] >= 3.2,
+     "praktis, fokus hasil, cepat mengambil keputusan"),
+
+    ("Gigih & Persisten",
+     lambda s: s["C"] >= 3.4 and s["N"] <= 3.0,
+     "konsisten, tahan tekanan, tidak mudah menyerah"),
+
+
+    # ==========================
+    # KESEIMBANGAN
+    # ==========================
+    ("Seimbang Adaptif",
+     lambda s: all(2.8 <= s[k] <= 3.5 for k in ["O","C","E","A","N"]),
+     "fleksibel, stabil, mampu menyesuaikan diri di berbagai situasi"),
 ]
 
 
@@ -626,7 +688,16 @@ def generate_global_conclusion(avg, dominant):
     conclusion = (
         f"Secara keseluruhan, trait kepribadian paling dominan adalah {dominant}. Individu ini cenderung "
     )
+    # PRIORITY EXTREME
+    if avg.get("EXTREME_ALERT", 0) >= 3:
+        conclusion = (
+            "Terdapat indikasi tekanan emosional yang sangat tinggi dan risiko kesehatan mental."
+        )
 
+        suggestion = (
+            "Sangat disarankan untuk segera mencari dukungan profesional, "
+            "berbicara dengan orang terpercaya, atau menghubungi layanan bantuan psikologis."
+        )
     if dominant == "O":
         conclusion += "kreatif, reflektif, dan terbuka terhadap ide baru."
     elif dominant == "C":
@@ -656,6 +727,11 @@ def generate_global_conclusion(avg, dominant):
         suggestion += "mempertahankan empati sambil belajar bersikap tegas saat dibutuhkan."
     elif dominant == "N":
         suggestion += "melatih regulasi emosi melalui manajemen stres, mindfulness, atau journaling rutin."
+    # Insight tambahan dari Neuroticism
+    if N <= 2.5:
+        conclusion += " Tingkat kestabilan emosi tergolong baik."
+    elif N >= 3.6:
+        conclusion += " Terdapat kecenderungan emosi negatif yang cukup tinggi."
 
     return conclusion, suggestion
 OCEAN_COLORS = {
