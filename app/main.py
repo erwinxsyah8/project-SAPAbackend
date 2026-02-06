@@ -175,10 +175,8 @@ def build_lexical_vector_with_analysis(text: str):
     vec = torch.log1p(vec)
     if vec.sum() > 0:
         vec = vec / vec.sum()
-
     coverage = len(matched_tokens) / max(len(token_set), 1)
     return vec.unsqueeze(0), round(coverage * 100, 2), dict(sorted(subtrait_scores.items(), key=lambda x: -x[1])), evidence
-
 # ==========================
 # ONTOLOGY EMBEDDING EXPANSION
 # ==========================
@@ -210,13 +208,10 @@ def expand_ontology_candidates(text: str, top_k=5, threshold=0.7):
     return sorted(candidates, key=lambda x: x["similarity"])[:top_k]
 # BASE_DIR = folder tempat script ini berada
 BASE_DIR = Path(__file__).parent  # __file__ = lokasi script ini
-
 # Path lengkap ke file Excel
 excel_path = BASE_DIR / "keywords_traits.xlsx"
-
 print("Mencoba membuka file:", excel_path)  # Debug
 df_keywords = pd.read_excel(excel_path)
-
 TRAIT_KEYWORDS = {}
 for _, row in df_keywords.iterrows():
     trait = str(row["Trait / Kategori"]).strip()  # pastikan string tanpa spasi
@@ -224,13 +219,11 @@ for _, row in df_keywords.iterrows():
     if trait not in TRAIT_KEYWORDS:
         TRAIT_KEYWORDS[trait] = []
     TRAIT_KEYWORDS[trait].append(word)
-
 # ==========================
 # CEK JUMLAH KATA PER TRAIT
 # ==========================
 for trait, words in TRAIT_KEYWORDS.items():
     print(f"{trait}: {len(words)} kata")
-
 # ==========================
 # ASSIGN KE VARIABEL GLOBAL (LIST)
 # ==========================
@@ -258,54 +251,36 @@ MENTAL_UNSTABLE_N = TRAIT_KEYWORDS.get("MENTAL_UNSTABLE_N", [])
 # ==========================
 from collections import Counter
 import re
-
-
 def adjust_ocean_by_keywords(scores: dict, text: str):
-
     adjusted = scores.copy()
-
     text_lower = text.lower()
     tokens = re.findall(r'\w+', text_lower)
     counter = Counter(tokens)
-
     # Extreme score
     adjusted["EXTREME_ALERT"] = 0
-
-
     # ==========================
     # 1. WORD BASED
     # ==========================
     for trait, keywords in TRAIT_KEYWORDS.items():
-
         if trait not in KEYWORD_TRAIT_MAP:
             continue
-
         weights = KEYWORD_TRAIT_MAP[trait]
-
         for word in keywords:
-
             if word in counter:
-
                 freq = counter[word]
-
                 # extreme detect
                 if trait == "EXTREME_NEGATIVE":
                     adjusted["EXTREME_ALERT"] += freq * 2
 
                 for ocean_dim, w in weights.items():
                     adjusted[ocean_dim] += w * freq
-
-
     # ==========================
     # 2. PHRASE BASED
     # ==========================
     for trait, keywords in TRAIT_KEYWORDS.items():
-
         if trait not in KEYWORD_TRAIT_MAP:
             continue
-
         weights = KEYWORD_TRAIT_MAP[trait]
-
         for phrase in keywords:
 
             if " " in phrase and phrase in text_lower:
@@ -315,56 +290,40 @@ def adjust_ocean_by_keywords(scores: dict, text: str):
 
                 for ocean_dim, w in weights.items():
                     adjusted[ocean_dim] += w * 1.5
-
-
     # ==========================
     # 3. NORMALIZATION
     # ==========================
     for k in ["O", "C", "E", "A", "N"]:
         adjusted[k] = max(1.0, min(5.0, adjusted[k]))
-
-
     # only OCEAN for dominant
     ocean_only = {k:v for k,v in adjusted.items() if k in ["O","C","E","A","N"]}
-
     dominant = max(ocean_only, key=ocean_only.get)
-
     return dominant, adjusted
-
 # ==========================
 # KEYWORD → OCEAN MAPPING
 # ==========================
 KEYWORD_TRAIT_MAP = {
-
 # ===== EMOSI NEGATIF =====
 "ANGER_EMO": {"N": 0.5, "A": -0.2},
 "SAD_EMO": {"N": 0.4, "O": 0.1},
 "ANXIETY_EMO": {"N": 0.6, "E": -0.2},
 "MENTAL_UNSTABLE_N": {"N": 1.0},
-
 "NEGATIVE_SOCIAL": {"N": 0.4, "A": -0.3, "E": -0.2},
-
 # ===== SOSIAL =====
 "POSITIVE_SOCIAL": {"E": 0.4, "A": 0.4, "N": -0.2},
 "EXTRAVERSION_E": {"E": 0.6},
 "E_SOCIAL_DEPENDENCY": {"E": 0.4, "A": 0.2},
-
 "COLLABORATION": {"A": 0.6, "E": 0.3, "C": 0.2},
-
 # ===== RELASIONAL =====
 "RELATIONSHIP_AFFECTION": {"A": 0.7, "E": 0.2},
 "EMPATHY_HARMONY_A": {"A": 0.8, "N": -0.3},
-
 "TRUST": {"A": 0.5},
-
 # ===== KOGNITIF =====
 "CREATIVE_DISCUSSION_A": {"O": 0.6, "E": 0.2},
 "INTROSPECTION": {"O": 0.5, "N": 0.1},
-
 # ===== PRODUKTIVITAS =====
 "DISCIPLINE_C": {"C": 0.9, "N": -0.2},
 "ACHIEVEMENT": {"C": 0.6, "E": 0.2},
-
 # ===== EMOSI POSITIF =====
 "EMO_POSITIVE": {"A": 0.3, "E": 0.3, "N": -0.2},
 "MENTAL_UNSTABLE_N": {"N": 1.0},
@@ -374,57 +333,37 @@ KEYWORD_TRAIT_MAP = {
     "A": -0.6,
     "C": -0.6
 },
-
-
 }
 # ==========================
 # EMOTIONAL ADJUSTMENT (FINE TUNING)
 # ==========================
 def apply_emotional_keyword_adjustment(text: str, scores: dict, o_reduce: float = 0.2):
-
     adjusted = scores.copy()
-
     text_lower = text.lower()
     tokens = re.findall(r'\w+', text_lower)
     counter = Counter(tokens)
-
-
     # ==========================
     # 1. EMOTIONAL BALANCE SCORE
     # ==========================
     neg_score = 0
     pos_score = 0
-
-
     for word in tokens:
-
         if word in ANGER_EMO or word in SAD_EMO or word in ANXIETY_EMO:
             neg_score += counter[word]
-
         if word in EMO_POSITIVE or word in POSITIVE_SOCIAL or word in TRUST:
             pos_score += counter[word]
-
-
     # ==========================
     # 2. ADJUST BASED ON BALANCE
     # ==========================
     if neg_score > pos_score:
-
         diff = min(2.0, (neg_score - pos_score) * 0.15)
-
         adjusted["N"] += diff
         adjusted["E"] -= diff * 0.4
-
-
     elif pos_score > neg_score:
-
         diff = min(2.0, (pos_score - neg_score) * 0.15)
-
         adjusted["A"] += diff
         adjusted["E"] += diff * 0.3
         adjusted["N"] -= diff * 0.3
-
-
     # ==========================
     # 3. O REDUCTION (CONTEXT AWARE)
     # ==========================
@@ -433,20 +372,14 @@ def apply_emotional_keyword_adjustment(text: str, scores: dict, o_reduce: float 
     for w in EMO_POSITIVE + CREATIVE_DISCUSSION_A + INTROSPECTION:
         if w in counter:
             creative_hits += counter[w]
-
-
     # Turunkan O hanya kalau TIDAK kreatif
     if creative_hits == 0:
         adjusted["O"] -= o_reduce
-
-
     # ==========================
     # 4. NORMALIZE
     # ==========================
     for k in ["O", "C", "E", "A", "N"]:
         adjusted[k] = round(min(5.0, max(1.0, adjusted[k])), 3)
-
-
     return adjusted
 # ==========================
 # DOMINANT TRAIT SEDERHANA
@@ -458,7 +391,6 @@ def determine_dominant_trait(scores, text):
     """
     text_lower = text.lower()
     tokens = re.findall(r'\w+', text_lower)
-
     # Hitung kata positif
     social_hits = sum(1 for w in POSITIVE_SOCIAL + COLLABORATION if w in tokens)
     emo_hits = sum(1 for w in EMO_POSITIVE if w in tokens)
@@ -471,12 +403,10 @@ def determine_dominant_trait(scores, text):
         return "E"
     if achievement_hits >= 1 or light_hits >= 1:
         return "O"
-
     # Default: trait tertinggi
     return max(scores, key=scores.get)
 import re
 from collections import Counter
-
 # ==========================
 # HIGHLIGHT YANG AKURAT
 # ==========================
@@ -496,8 +426,6 @@ def highlight_keywords_in_text(text: str, evidence: dict):
     # Bangun teks dengan <mark>
     result = "".join(f"<mark>{t}</mark>" if t.lower() in highlights else t for t in tokens)
     return result
-
-
 # ==========================
 # SUPER EXPLANATION YANG DISERDERHANAKAN
 # ==========================
@@ -514,7 +442,6 @@ def generate_explanation_suggestion_super(text, adjusted, evidence):
     dominant = max(adjusted, key=adjusted.get)
     words = extract_keywords(text)
     snippet = ", ".join(words[:3])
-
     # Peringatan jika ada EXTREME_ALERT
     if adjusted.get("EXTREME_ALERT", 0) > 0:
         explanation = (
@@ -533,23 +460,17 @@ def generate_explanation_suggestion_super(text, adjusted, evidence):
         suggestion = (
             f"Mengamati hal seperti {snippet} dapat membantu memahami dan mengoptimalkan trait {dominant}."
         )
-
     return explanation, suggestion
-
-
 # ==========================
 # DOMINANT CONTEXTUAL YANG DISERDERHANAKAN
 # ==========================
 def determine_dominant_contextual(adjusted, evidence):
-
     scores = adjusted.copy()
-
     scores["E"] += len(evidence.get("POSITIVE_SOCIAL", [])) * 0.3
     scores["A"] += len(evidence.get("EMPATHY_HARMONY_A", [])) * 0.4
     scores["C"] += len(evidence.get("DISCIPLINE_C", [])) * 0.4
     scores["O"] += len(evidence.get("CREATIVE_DISCUSSION_A", [])) * 0.4
     scores["N"] += len(evidence.get("ANXIETY_EMO", [])) * 0.5
-
     return max(scores, key=scores.get)
 def normalize_scores(scores, min_val=1.0, max_val=5.0):
 
@@ -564,11 +485,9 @@ PERSONA_RULES = [
     ("Krisis Emosional Tinggi",
      lambda s: s.get("EXTREME_ALERT", 0) >= 3 or s["N"] >= 4.7,
      "menunjukkan tanda tekanan psikologis berat, putus asa, atau risiko menyakiti diri"),
-
     ("Depresi Mendalam",
      lambda s: s.get("EXTREME_ALERT", 0) >= 2 and s["E"] <= 2.5 and s["N"] >= 4.2,
      "menarik diri, kehilangan motivasi, dan mengalami kesedihan intens"),
-
     ("Burnout Mental Berat",
      lambda s: s.get("EXTREME_ALERT", 0) >= 2 and s["C"] <= 2.8 and s["N"] >= 4.0,
      "kelelahan emosional ekstrem, kehilangan arah, dan kehabisan energi"),
@@ -576,34 +495,25 @@ PERSONA_RULES = [
     # EMOSI NEGATIF
     # ==========================
     # CEMAS → REFLEKTIF, BANYAK PIKIR
-    
     ("Cemas & Overthinking",
     lambda s: s["N"] >= 3.6 and s["O"] >= 3.4 and s["C"] >= 3.0,
     "mudah khawatir, banyak berpikir, reflektif terhadap masalah"),
-
     # TEMPRAMENTAL → REAKTIF, KURANG KONTROL
     ("Tempramental",
     lambda s: s["N"] >= 4.0 and s["A"] <= 2.9 and s["C"] <= 3.0,
     "emosional, mudah tersulut, impulsif saat tertekan"),
-
-
     ("Melankolis Reflektif",
      lambda s: s["N"] >= 3.3 and s["O"] >= 3.3 and s["E"] <= 3.0,
      "sering merenung, introspektif, sensitif terhadap perasaan"),
-
-
     # ==========================
     # STABILITAS EMOSI
     # ==========================
     ("Stabil Emosional",
      lambda s: s["N"] <= 2.5,
      "tenang, terkendali, mampu mengelola tekanan dengan baik"),
-
     ("Tangguh Mental",
      lambda s: s["C"] >= 3.5 and s["N"] <= 3.0,
      "kuat secara mental, tidak mudah menyerah, fokus solusi"),
-
-
     # ==========================
     # SOSIAL & EKSTROVERSI
     # ==========================
@@ -618,8 +528,6 @@ PERSONA_RULES = [
     ("Introvert Mandiri",
      lambda s: s["E"] <= 2.8 and s["C"] >= 3.2,
      "mandiri, fokus, nyaman bekerja sendiri"),
-
-
     # ==========================
     # RELASIONAL & CINTA
     # ==========================
@@ -648,8 +556,6 @@ PERSONA_RULES = [
     ("Reflektif Analitis",
      lambda s: s["O"] >= 3.3 and s["C"] >= 3.3,
      "mendalam, sistematis, kritis dalam berpikir"),
-
-
     # ==========================
     # DISIPLIN & KERJA
     # ==========================
@@ -668,8 +574,6 @@ PERSONA_RULES = [
     ("Gigih & Persisten",
      lambda s: s["C"] >= 3.4 and s["N"] <= 3.0,
      "konsisten, tahan tekanan, tidak mudah menyerah"),
-
-
     # ==========================
     # KESEIMBANGAN
     # ==========================
@@ -677,7 +581,6 @@ PERSONA_RULES = [
      lambda s: all(2.8 <= s[k] <= 3.5 for k in ["O","C","E","A","N"]),
      "fleksibel, stabil, mampu menyesuaikan diri di berbagai situasi"),
 ]
-
 
 # ==========================
 # GLOBAL CONCLUSION
@@ -708,13 +611,11 @@ def generate_global_conclusion(avg, dominant):
         conclusion += "kooperatif, empatik, dan menjaga keharmonisan sosial."
     elif dominant == "N":
         conclusion += "sensitif terhadap tekanan emosional dan mudah mengalami stres."
-
     # Insight tambahan dari Neuroticism
     if N < 0.35:
         conclusion += " Tingkat kestabilan emosi tergolong baik."
     elif N > 0.6:
         conclusion += " Terdapat kecenderungan emosi negatif yang cukup tinggi."
-
     # ================= SARAN =================
     suggestion = "Disarankan untuk "
     if dominant == "C":
